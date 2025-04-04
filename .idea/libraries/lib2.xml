@@ -1,0 +1,30 @@
+<component name="libraryTable">
+  <library name="lib2">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/slf4j-api-1.7.25.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/slf4j-api-1.7.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/mysql-connector-java-8.0.30.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.activation-1.2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/mysql-connector.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/itextpdf-5.5.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/zxing-core-2.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/flatlaf-extras-3.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/flatlaf-fonts-roboto-2.137.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/TimingFramework-0.55.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/bridj-0.7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javase-3.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/core-3.3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/javax.mail.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/swingx-all-1.6.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/log4j-core-2.20.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/zxing-1.7-javase.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/flatlaf-3.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/webcam-capture-0.3.12.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/svgSalamander-1.1.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/jcalendar-1.4.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/slf4j-simple-1.7.25.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
