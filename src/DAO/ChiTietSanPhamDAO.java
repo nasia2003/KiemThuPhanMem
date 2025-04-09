@@ -54,7 +54,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
     public int update(ChiTietSanPhamDTO t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "UPDATE `ctsanpham` SET `maphienbansp`=?,`maphieunhap`=?,`maphieuxuat`=?,`tinhtrang`=? WHERE `maimei`=?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, t.getMaphienbansp());
@@ -63,7 +63,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
             pst.setInt(4, t.getTinhtrang());
             pst.setString(5, t.getImei());
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(ChiTietSanPhamDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -73,14 +73,14 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
     public int updateXuat(ChiTietSanPhamDTO t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "UPDATE `ctsanpham` SET `maphieuxuat`=?,`tinhtrang`=? WHERE `maimei`=?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, t.getMaphieuxuat());
             pst.setInt(2, t.getTinhtrang());
             pst.setString(3, t.getImei());
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(ChiTietSanPhamDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -90,12 +90,12 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
     public int reset(ChiTietSanPhamDTO t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "UPDATE `ctsanpham` SET `maphieuxuat`= NULL ,`tinhtrang`='1' WHERE `maimei`=?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setString(1, t.getImei());
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(ChiTietSanPhamDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -106,11 +106,11 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
     public int delete(String t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "UPDATE `ctsanpham` SET `tinhtrang` = 0 WHERE  maimei = ?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(KhuVucKhoDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -120,12 +120,12 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
     public int deletePn(int t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "DELETE FROM ctsanpham WHERE maphieunhap = ?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setInt(1, t);
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(ChiTietPhieuXuatDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -149,7 +149,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
                 ChiTietSanPhamDTO ct = new ChiTietSanPhamDTO(imei, macauhinh, maphieunhap, maphieuxuat, tinhtrang);
                 result.add(ct);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (Exception e) {
         }
         return result;
@@ -159,7 +159,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
     public ArrayList<ChiTietSanPhamDTO> selectAllbyPb(int mapbsp) {
         ArrayList<ChiTietSanPhamDTO> result = new ArrayList<>();
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM ctsanpham where maphienbansp = ? and tinhtrang = 1";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, mapbsp);
@@ -173,7 +173,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
                 ChiTietSanPhamDTO ct = new ChiTietSanPhamDTO(imei, maphienban, maphieunhap, maphieuxuat, tinhtrang);
                 result.add(ct);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -182,7 +182,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
     public ArrayList<ChiTietSanPhamDTO> selectbyPb(int mapbsp) {
         ArrayList<ChiTietSanPhamDTO> result = new ArrayList<>();
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM ctsanpham where maphienbansp = ?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, mapbsp);
@@ -196,7 +196,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
                 ChiTietSanPhamDTO ct = new ChiTietSanPhamDTO(imei, maphienban, maphieunhap, maphieuxuat, tinhtrang);
                 result.add(ct);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -240,7 +240,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
     public ArrayList<Integer> getMaPhienBanSPOfPhieu(int maphieu) {
         ArrayList<Integer> result = new ArrayList<>();
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM ctsanpham where maphieunhap = ?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, maphieu);
@@ -249,7 +249,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
                 int maphienban = rs.getInt("maphienbansp");
                 result.add(maphienban);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -259,7 +259,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
     public ArrayList<ChiTietSanPhamDTO> selectAllByMaPhieuNhap(int maphieunhap) {
         ArrayList<ChiTietSanPhamDTO> result = new ArrayList<>();
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM ctsanpham where maphieunhap = ?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, maphieunhap);
@@ -273,7 +273,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
                 ChiTietSanPhamDTO ct = new ChiTietSanPhamDTO(imei, maphienban, mapn, maphieuxuat, tinhtrang);
                 result.add(ct);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -283,7 +283,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
     public ArrayList<ChiTietSanPhamDTO> selectAllByMaPhieuXuat(int maphieunhap) {
         ArrayList<ChiTietSanPhamDTO> result = new ArrayList<>();
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM ctsanpham where maphieuxuat = ?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, maphieunhap);
@@ -297,7 +297,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
                 ChiTietSanPhamDTO ct = new ChiTietSanPhamDTO(imei, maphienban, mapn, maphieuxuat, tinhtrang);
                 result.add(ct);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException e) {
             System.out.println(e);
         }

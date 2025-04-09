@@ -29,7 +29,7 @@ import java.util.logging.Logger;
  * @author Tran Nhat Sinh
  */
 public class ThongKeDAO {
-
+    public static Connection con = ConnectionCustom.getInstance().getConnect();
     public static ThongKeDAO getInstance() {
         return new ThongKeDAO();
     }
@@ -44,7 +44,7 @@ public class ThongKeDAO {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         try {
-            Connection con = JDBCUtil.getConnection();
+//            Connection con = JDBCUtil.getConnection();
             String sql = """
                          WITH nhap AS (
                            SELECT maphienbansp, SUM(soluong) AS sl_nhap
@@ -94,7 +94,7 @@ public class ThongKeDAO {
                          JOIN mausac ON phienbansanpham.mausac = mausac.mamau
                          )
                          SELECT * FROM temp_table
-                         WHERE tensp LIKE ? OR masp LIKE ?
+                         WHERE tensp LIKE ?
                          ORDER BY masp;""";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setTimestamp(1, new Timestamp(timeStart.getTime()));
@@ -104,7 +104,6 @@ public class ThongKeDAO {
             pst.setTimestamp(5, new Timestamp(timeStart.getTime()));
             pst.setTimestamp(6, new Timestamp(timeStart.getTime()));
             pst.setString(7, "%" + text + "%");
-            pst.setString(8, "%" + text + "%");
 
             ResultSet rs = pst.executeQuery();
             while (rs.next()) {
