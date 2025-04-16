@@ -15,6 +15,7 @@ import java.util.ArrayList;
  * @author Tran Nhat Sinh
  */
 public class MauSacDAO implements DAOinterface<MauSacDTO> {
+    public static Connection con = ConnectionCustom.getInstance().getConnect();
 
     public static MauSacDAO getInstance() {
         return new MauSacDAO();
@@ -24,13 +25,13 @@ public class MauSacDAO implements DAOinterface<MauSacDTO> {
     public int insert(MauSacDTO t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "INSERT INTO `mausac`(`mamau`, `tenmau`,`trangthai`) VALUES (?,?,1)";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, t.getMamau());
             pst.setString(2, t.getTenmau());
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(MauSacDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -41,13 +42,13 @@ public class MauSacDAO implements DAOinterface<MauSacDTO> {
     public int update(MauSacDTO t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "UPDATE `mausac` SET `tenmau`=? WHERE `mamau`=?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setString(1, t.getTenmau());
             pst.setInt(2, t.getMamau());
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(MauSacDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -58,12 +59,12 @@ public class MauSacDAO implements DAOinterface<MauSacDTO> {
     public int delete(String t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "UPDATE `mausac` SET `trangthai` = 0 WHERE mamau = ?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setString(1,t);
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(MauSacDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -74,7 +75,7 @@ public class MauSacDAO implements DAOinterface<MauSacDTO> {
     public ArrayList<MauSacDTO> selectAll() {
         ArrayList<MauSacDTO> result = new ArrayList<>();
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM mausac WHERE trangthai = 1";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             ResultSet rs = (ResultSet) pst.executeQuery();
@@ -84,7 +85,7 @@ public class MauSacDAO implements DAOinterface<MauSacDTO> {
                 MauSacDTO ms = new MauSacDTO(mamau, tenmau);
                 result.add(ms);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (Exception e) {
         }
         return result;
@@ -93,7 +94,7 @@ public class MauSacDAO implements DAOinterface<MauSacDTO> {
     public ArrayList<MauSacDTO> getAll() {
         ArrayList<MauSacDTO> result = new ArrayList<>();
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM mausac";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             ResultSet rs = (ResultSet) pst.executeQuery();
@@ -103,7 +104,7 @@ public class MauSacDAO implements DAOinterface<MauSacDTO> {
                 MauSacDTO ms = new MauSacDTO(mamau, tenmau);
                 result.add(ms);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (Exception e) {
         }
         return result;
@@ -113,7 +114,7 @@ public class MauSacDAO implements DAOinterface<MauSacDTO> {
     public MauSacDTO selectById(String t) {
         MauSacDTO result = null;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM mausac WHERE mamau=?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setString(1, t);
@@ -123,7 +124,7 @@ public class MauSacDAO implements DAOinterface<MauSacDTO> {
                 String tenmau = rs.getString("tenmau");
                 result = new MauSacDTO(mamau, tenmau);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException e) {
         }
         return result;
@@ -133,7 +134,7 @@ public class MauSacDAO implements DAOinterface<MauSacDTO> {
     public int getAutoIncrement() {
         int result = -1;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT `AUTO_INCREMENT` FROM  INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'quanlikhohang' AND   TABLE_NAME   = 'mausac'";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             ResultSet rs2 = pst.executeQuery(sql);
