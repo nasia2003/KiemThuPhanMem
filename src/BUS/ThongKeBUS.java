@@ -35,7 +35,7 @@ public class ThongKeBUS {
         this.tkkh = ThongKeDAO.getThongKeKhachHang(text,start, end);
         return this.tkkh;
     }
-        public ArrayList<ThongKeNhaCungCapDTO> getAllNCC() {
+    public ArrayList<ThongKeNhaCungCapDTO> getAllNCC() {
         this.tkncc=ThongKeDAO.getThongKeNCC("",new Date(0), new Date(System.currentTimeMillis()));
         return this.tkncc;
     }
