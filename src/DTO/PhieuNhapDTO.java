@@ -13,6 +13,8 @@ import java.sql.Timestamp;
 public class PhieuNhapDTO extends PhieuDTO{
     private int manhacungcap;
 
+    public PhieuNhapDTO(){}
+
     public PhieuNhapDTO(int manhacungcap) {
         this.manhacungcap = manhacungcap;
     }
