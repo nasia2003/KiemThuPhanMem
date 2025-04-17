@@ -1,6 +1,6 @@
 package DAO;
 
-import DTO.KhuVucKhoDTO;
+import DTO.ThuocTinhSanPham.XuatXuDTO;
 import static org.junit.Assert.*;
 import org.junit.*;
 
@@ -8,36 +8,33 @@ import java.sql.*;
 import java.util.ArrayList;
 
 /**
- * Unit Test cho lớp KhuVucKhoDAO
+ * Unit Test cho lớp XuatXuDAO
  */
-public class KhuVucKhoDAOTest {
+public class XuatXuDAOTest {
 
     private static Connection connection;
-    private static KhuVucKhoDAO khuVucKhoDAO;
-    private static final String TEN_TEST = "KVK_Test";
-    private static final String GHI_CHU_TEST = "GhiChu_Test";
-    private static int maKhuVucTest;
+    private static XuatXuDAO xuatXuDAO;
+    private static final String TEN_TEST = "XX_Test";
+    private static int maXuatXuTest;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         connection = ConnectionCustom.getInstance().getConnect();
-        khuVucKhoDAO = KhuVucKhoDAO.getInstance();
+        xuatXuDAO = XuatXuDAO.getInstance();
     }
 
     @Before
     public void setUp() throws Exception {
         connection.setAutoCommit(false);
 
-        // Insert dữ liệu test
-        String sql = "INSERT INTO khuvuckho (tenkhuvuc, ghichu, trangthai) VALUES (?, ?, 1)";
+        String sql = "INSERT INTO xuatxu (tenxuatxu, trangthai) VALUES (?, 1)";
         PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
         pst.setString(1, TEN_TEST);
-        pst.setString(2, GHI_CHU_TEST);
         pst.executeUpdate();
 
         ResultSet rs = pst.getGeneratedKeys();
         if (rs.next()) {
-            maKhuVucTest = rs.getInt(1);
+            maXuatXuTest = rs.getInt(1);
         }
         rs.close();
         pst.close();
@@ -49,7 +46,7 @@ public class KhuVucKhoDAOTest {
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void globalTearDown() throws Exception {
         if (connection != null && !connection.isClosed()) {
             connection.close();
         }
@@ -57,22 +54,22 @@ public class KhuVucKhoDAOTest {
 
     /**
      * TC01 - Insert thành công
-     * Mục tiêu: Insert khu vực kho mới vào CSDL
-     * Input: tenkhuvuc = "KVK Insert", ghichu = "Insert Test"
+     * Mục tiêu: Insert xuất xứ mới vào CSDL
+     * Input: maxuatxu = bất kỳ (ví dụ 0), tenxuatxu = "XX Insert"
      * Expected output: insert trả về 1, dữ liệu tồn tại trong DB
      */
     @Test
     public void testInsertThanhCong() throws Exception {
-        KhuVucKhoDTO dto = new KhuVucKhoDTO(0, "KVK Insert", "Insert Test");
-        int result = khuVucKhoDAO.insert(dto);
+        XuatXuDTO dto = new XuatXuDTO(0, "XX Insert");
+        int result = xuatXuDAO.insert(dto);
         assertEquals(1, result);
 
-        PreparedStatement pst = connection.prepareStatement("SELECT * FROM khuvuckho WHERE tenkhuvuc = ?");
-        pst.setString(1, "KVK Insert");
+        PreparedStatement pst = connection.prepareStatement("SELECT * FROM xuatxu WHERE tenxuatxu = ?");
+        pst.setString(1, "XX Insert");
         ResultSet rs = pst.executeQuery();
 
         assertTrue(rs.next());
-        assertEquals("Insert Test", rs.getString("ghichu"));
+        assertEquals("XX Insert", rs.getString("tenxuatxu"));
         rs.close();
         pst.close();
     }
@@ -80,34 +77,34 @@ public class KhuVucKhoDAOTest {
     /**
      * TC02 - Insert trùng ID
      * Mục tiêu: Không insert khi ID đã tồn tại
-     * Input: makhuvuc = maKhuVucTest (ID đã có), tenkhuvuc = "KVK Trùng"
+     * Input: maxuatxu = maXuatXuTest (ID đã có), tenxuatxu = "XX Trùng"
      * Expected output: insert trả về 0
      */
     @Test
     public void testInsertTrungID() throws Exception {
-        KhuVucKhoDTO dto = new KhuVucKhoDTO(maKhuVucTest, "KVK Trùng", "Note");
-        int result = khuVucKhoDAO.insert(dto);
+        XuatXuDTO dto = new XuatXuDTO(maXuatXuTest, "XX Trùng");
+        int result = xuatXuDAO.insert(dto);
         assertEquals(0, result);
     }
 
     /**
      * TC03 - Update thành công
-     * Mục tiêu: Cập nhật dữ liệu khu vực đã có
-     * Input: makhuvuc = maKhuVucTest, tenkhuvuc = "KVK Updated", ghichu = "Note Updated"
-     * Expected output: update trả về 1, dữ liệu trong DB được cập nhật
+     * Mục tiêu: Cập nhật tên xuất xứ theo ID đã có
+     * Input: maxuatxu = maXuatXuTest, tenxuatxu = "XX Updated"
+     * Expected output: update trả về 1, tên được cập nhật
      */
     @Test
     public void testUpdateThanhCong() throws Exception {
-        KhuVucKhoDTO dto = new KhuVucKhoDTO(maKhuVucTest, "KVK Updated", "Note Updated");
-        int result = khuVucKhoDAO.update(dto);
+        XuatXuDTO dto = new XuatXuDTO(maXuatXuTest, "XX Updated");
+        int result = xuatXuDAO.update(dto);
         assertEquals(1, result);
 
-        PreparedStatement pst = connection.prepareStatement("SELECT * FROM khuvuckho WHERE makhuvuc = ?");
-        pst.setInt(1, maKhuVucTest);
+        PreparedStatement pst = connection.prepareStatement("SELECT * FROM xuatxu WHERE maxuatxu = ?");
+        pst.setInt(1, maXuatXuTest);
         ResultSet rs = pst.executeQuery();
 
         assertTrue(rs.next());
-        assertEquals("KVK Updated", rs.getString("tenkhuvuc"));
+        assertEquals("XX Updated", rs.getString("tenxuatxu"));
         rs.close();
         pst.close();
     }
@@ -115,29 +112,29 @@ public class KhuVucKhoDAOTest {
     /**
      * TC04 - Update không tồn tại
      * Mục tiêu: Không cập nhật khi ID không tồn tại
-     * Input: makhuvuc = 999999, tenkhuvuc = "XXX"
+     * Input: maxuatxu = 999999, tenxuatxu = "XXX"
      * Expected output: update trả về 0
      */
     @Test
     public void testUpdateKhongTonTai() throws Exception {
-        KhuVucKhoDTO dto = new KhuVucKhoDTO(999999, "XXX", "YYY");
-        int result = khuVucKhoDAO.update(dto);
+        XuatXuDTO dto = new XuatXuDTO(999999, "XXX");
+        int result = xuatXuDAO.update(dto);
         assertEquals(0, result);
     }
 
     /**
      * TC05 - Delete thành công
-     * Mục tiêu: Xóa mềm khu vực kho (đổi trạng thái = 0)
-     * Input: makhuvuc = maKhuVucTest
+     * Mục tiêu: Xóa mềm xuất xứ (đổi trạng thái = 0)
+     * Input: maxuatxu = maXuatXuTest
      * Expected output: delete trả về 1, trạng thái = 0
      */
     @Test
     public void testDeleteThanhCong() throws Exception {
-        int result = khuVucKhoDAO.delete(String.valueOf(maKhuVucTest));
+        int result = xuatXuDAO.delete(String.valueOf(maXuatXuTest));
         assertEquals(1, result);
 
-        PreparedStatement pst = connection.prepareStatement("SELECT trangthai FROM khuvuckho WHERE makhuvuc = ?");
-        pst.setInt(1, maKhuVucTest);
+        PreparedStatement pst = connection.prepareStatement("SELECT trangthai FROM xuatxu WHERE maxuatxu = ?");
+        pst.setInt(1, maXuatXuTest);
         ResultSet rs = pst.executeQuery();
 
         assertTrue(rs.next());
@@ -148,30 +145,30 @@ public class KhuVucKhoDAOTest {
 
     /**
      * TC06 - Delete không tồn tại
-     * Mục tiêu: Không xóa khi ID không có trong DB
-     * Input: makhuvuc = 999999
+     * Mục tiêu: Không xóa khi ID không tồn tại
+     * Input: maxuatxu = 999999
      * Expected output: delete trả về 0
      */
     @Test
     public void testDeleteKhongTonTai() throws Exception {
-        int result = khuVucKhoDAO.delete("999999");
+        int result = xuatXuDAO.delete("999999");
         assertEquals(0, result);
     }
 
     /**
      * TC07 - SelectAll
-     * Mục tiêu: Lấy danh sách tất cả khu vực đang hoạt động
+     * Mục tiêu: Lấy danh sách tất cả xuất xứ đang hoạt động
      * Input: Không có
-     * Expected output: Trả về list chứa phần tử có makhuvuc = maKhuVucTest
+     * Expected output: Trả về list chứa phần tử có maxuatxu = maXuatXuTest
      */
     @Test
     public void testSelectAll() throws Exception {
-        ArrayList<KhuVucKhoDTO> ds = khuVucKhoDAO.selectAll();
+        ArrayList<XuatXuDTO> ds = xuatXuDAO.selectAll();
         assertNotNull(ds);
 
         boolean found = false;
-        for (KhuVucKhoDTO kvk : ds) {
-            if (kvk.getMakhuvuc() == maKhuVucTest) {
+        for (XuatXuDTO xx : ds) {
+            if (xx.getMaxuatxu() == maXuatXuTest) {
                 found = true;
                 break;
             }
@@ -181,54 +178,42 @@ public class KhuVucKhoDAOTest {
 
     /**
      * TC08 - SelectById thành công
-     * Mục tiêu: Lấy thông tin khu vực theo ID
-     * Input: makhuvuc = maKhuVucTest
+     * Mục tiêu: Lấy thông tin xuất xứ theo ID
+     * Input: maxuatxu = maXuatXuTest
      * Expected output: DTO trả về != null và đúng ID
      */
     @Test
     public void testSelectByIdThanhCong() throws Exception {
-        KhuVucKhoDTO dto = khuVucKhoDAO.selectById(String.valueOf(maKhuVucTest));
+        XuatXuDTO dto = xuatXuDAO.selectById(String.valueOf(maXuatXuTest));
         assertNotNull(dto);
-        assertEquals(maKhuVucTest, dto.getMakhuvuc());
+        assertEquals(maXuatXuTest, dto.getMaxuatxu());
     }
 
     /**
      * TC09 - SelectById không tồn tại
-     * Mục tiêu: Không trả về kết quả khi ID không có
-     * Input: makhuvuc = 999999
+     * Mục tiêu: Không trả về kết quả khi ID không tồn tại
+     * Input: maxuatxu = 999999
      * Expected output: Trả về null
      */
     @Test
     public void testSelectByIdKhongTonTai() throws Exception {
-        KhuVucKhoDTO dto = khuVucKhoDAO.selectById("999999");
+        XuatXuDTO dto = xuatXuDAO.selectById("999999");
         assertNull(dto);
     }
 
     /**
-     * TC10 - SelectById null
-     * Mục tiêu: Không trả về kết quả khi ID null
-     * Input: makhuvuc = null
-     * Expected output: Trả về null
-     */
-    @Test
-    public void testSelectByIdNull() throws Exception {
-        KhuVucKhoDTO dto = khuVucKhoDAO.selectById(null);
-        assertNull(dto);
-    }
-
-    /**
-     * TC11 - GetAutoIncrement
+     * TC10 - GetAutoIncrement
      * Mục tiêu: Lấy giá trị auto increment tiếp theo
      * Input: Không có
      * Expected output: Trả về giá trị bằng với AUTO_INCREMENT trong DB
      */
     @Test
     public void testGetAutoIncrement() throws Exception {
-        int value = khuVucKhoDAO.getAutoIncrement();
+        int value = xuatXuDAO.getAutoIncrement();
 
         PreparedStatement pst = connection.prepareStatement(
                 "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES " +
-                        "WHERE TABLE_SCHEMA = 'quanlikhohang' AND TABLE_NAME = 'khuvuckho'"
+                        "WHERE TABLE_SCHEMA = 'quanlikhohang' AND TABLE_NAME = 'xuatxu'"
         );
         ResultSet rs = pst.executeQuery();
         rs.next();
@@ -237,5 +222,17 @@ public class KhuVucKhoDAOTest {
         assertEquals(dbValue, value);
         rs.close();
         pst.close();
+    }
+
+    /**
+     * TC11 - Exception khi selectById truyền null
+     * Mục tiêu: Đảm bảo không ném exception khi truyền null
+     * Input: null
+     * Expected output: Trả về null (xử lý an toàn)
+     */
+    @Test
+    public void testSelectByIdNull() {
+        XuatXuDTO dto = xuatXuDAO.selectById(null);
+        assertNull(dto);
     }
 }

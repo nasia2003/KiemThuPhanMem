@@ -1,37 +1,37 @@
 package DAO;
 
-import DTO.ThuocTinhSanPham.MauSacDTO;
+import DTO.ThuocTinhSanPham.DungLuongRomDTO;
 import static org.junit.Assert.*;
 import org.junit.*;
 
 import java.sql.*;
 import java.util.ArrayList;
 
-public class MauSacDAOTest {
+public class DungLuongRomDAOTest {
 
     private static Connection connection;
-    private static MauSacDAO mauSacDAO;
-    private static final String TENMAU_TEST = "Màu test";
-    private static int mamauTest;
+    private static DungLuongRomDAO dungLuongRomDAO;
+    private static final int DUNGLUONG_TEST = 99;
+    private static int madlTest;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
         connection = ConnectionCustom.getInstance().getConnect();
-        mauSacDAO = MauSacDAO.getInstance();
+        dungLuongRomDAO = DungLuongRomDAO.getInstance();
     }
 
     @Before
     public void setUp() throws Exception {
         connection.setAutoCommit(false);
 
-        String sql = "INSERT INTO mausac (tenmau, trangthai) VALUES (?, 1)";
+        String sql = "INSERT INTO dungluongrom (kichthuocrom, trangthai) VALUES (?, 1)";
         PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-        pst.setString(1, TENMAU_TEST);
+        pst.setInt(1, DUNGLUONG_TEST);
         pst.executeUpdate();
 
         ResultSet rs = pst.getGeneratedKeys();
         if (rs.next()) {
-            mamauTest = rs.getInt(1);
+            madlTest = rs.getInt(1);
         }
 
         rs.close();
@@ -52,22 +52,22 @@ public class MauSacDAOTest {
 
     /**
      * TC01 - Insert thành công
-     * Mục tiêu: Thêm mới màu sắc khi dữ liệu hợp lệ
-     * Input: tenmau = "MauSac Test"
+     * Mục tiêu: Thêm mới dung lượng ROM khi dữ liệu hợp lệ
+     * Input: dungluongrom = 256
      * Expected Output: trả về 1, có bản ghi trong DB
      */
     @Test
     public void testInsertThanhCong() throws Exception {
-        MauSacDTO dto = new MauSacDTO(0, "MauSac Test");
-        int result = mauSacDAO.insert(dto);
+        DungLuongRomDTO dto = new DungLuongRomDTO(0, 256);
+        int result = dungLuongRomDAO.insert(dto);
         assertEquals(1, result);
 
-        PreparedStatement pst = connection.prepareStatement("SELECT * FROM mausac WHERE tenmau = ?");
-        pst.setString(1, "MauSac Test");
+        PreparedStatement pst = connection.prepareStatement("SELECT * FROM dungluongrom WHERE kichthuocrom = ?");
+        pst.setInt(1, 256);
         ResultSet rs = pst.executeQuery();
 
         assertTrue(rs.next());
-        assertEquals("MauSac Test", rs.getString("tenmau"));
+        assertEquals(256, rs.getInt("kichthuocrom"));
         rs.close();
         pst.close();
     }
@@ -80,21 +80,21 @@ public class MauSacDAOTest {
      */
     @Test(expected = Exception.class)
     public void testInsertNull() throws Exception {
-        mauSacDAO.insert(null);
+        dungLuongRomDAO.insert(null);
     }
 
     /**
-     * TC03 - Insert tên trùng
-     * Mục tiêu: Không cho phép thêm màu trùng tên nếu hệ thống không cho phép
-     * Input: tenmau = TENMAU_TEST
+     * TC03 - Insert dung lượng trùng
+     * Mục tiêu: Không cho phép thêm dung lượng trùng nếu hệ thống không cho phép
+     * Input: dungluongrom = DUNGLUONG_TEST
      * Expected Output: tùy logic xử lý trùng, test này nên trả về exception hoặc result = 0
      */
     @Test
-    public void testInsertTrungTen() throws Exception {
-        MauSacDTO dto = new MauSacDTO(0, TENMAU_TEST);
+    public void testInsertTrungDungLuong() throws Exception {
+        DungLuongRomDTO dto = new DungLuongRomDTO(0, DUNGLUONG_TEST);
         try {
-            int result = mauSacDAO.insert(dto);
-            assertTrue("Không được chấp nhận tên trùng nếu không cho phép", result == 0 || result == -1);
+            int result = dungLuongRomDAO.insert(dto);
+            assertEquals(0, result);
         } catch (Exception e) {
             // Nếu hệ thống throw thì pass
             assertTrue(true);
@@ -103,36 +103,36 @@ public class MauSacDAOTest {
 
     /**
      * TC04 - Update thành công
-     * Mục tiêu: Cập nhật tên màu thành công theo mã màu
-     * Input: mamau = mamauTest, tenmau = "Blue"
-     * Expected Output: trả về 1, DB lưu tênmàu mới
+     * Mục tiêu: Cập nhật dung lượng ROM thành công theo mã
+     * Input: madlrom = madlTest, dungluongrom = 512
+     * Expected Output: trả về 1, DB lưu dung lượng mới
      */
     @Test
     public void testUpdateThanhCong() throws Exception {
-        MauSacDTO dto = new MauSacDTO(mamauTest, "Blue");
-        int result = mauSacDAO.update(dto);
+        DungLuongRomDTO dto = new DungLuongRomDTO(madlTest, 999);
+        int result = dungLuongRomDAO.update(dto);
         assertEquals(1, result);
 
-        PreparedStatement pst = connection.prepareStatement("SELECT * FROM mausac WHERE mamau = ?");
-        pst.setInt(1, mamauTest);
+        PreparedStatement pst = connection.prepareStatement("SELECT * FROM dungluongrom WHERE madlrom = ?");
+        pst.setInt(1, madlTest);
         ResultSet rs = pst.executeQuery();
 
         assertTrue(rs.next());
-        assertEquals("Blue", rs.getString("tenmau"));
+        assertEquals(999, rs.getInt("kichthuocrom"));
         rs.close();
         pst.close();
     }
 
     /**
      * TC05 - Update với mã không tồn tại
-     * Mục tiêu: Không cập nhật khi mã màu không tồn tại
-     * Input: mamau = 9999, tenmau = "Green"
+     * Mục tiêu: Không cập nhật khi mã không tồn tại
+     * Input: madlrom = 9999, dungluongrom = 1024
      * Expected Output: trả về 0
      */
     @Test
     public void testUpdateIdNotFound() throws Exception {
-        MauSacDTO dto = new MauSacDTO(9999, "Green");
-        int result = mauSacDAO.update(dto);
+        DungLuongRomDTO dto = new DungLuongRomDTO(9999, 1024);
+        int result = dungLuongRomDAO.update(dto);
         assertEquals(0, result);
     }
 
@@ -144,22 +144,22 @@ public class MauSacDAOTest {
      */
     @Test(expected = Exception.class)
     public void testUpdateNull() throws Exception {
-        mauSacDAO.update(null);
+        dungLuongRomDAO.update(null);
     }
 
     /**
      * TC07 - Delete thành công
-     * Mục tiêu: Xóa mềm màu sắc (chuyển trạng thái về 0)
-     * Input: mamau = mamauTest
+     * Mục tiêu: Xóa mềm dung lượng ROM (chuyển trạng thái về 0)
+     * Input: madlrom = madlTest
      * Expected Output: trả về 1, trạng thái = 0 trong DB
      */
     @Test
     public void testDeleteThanhCong() throws Exception {
-        int result = mauSacDAO.delete(String.valueOf(mamauTest));
+        int result = dungLuongRomDAO.delete(String.valueOf(madlTest));
         assertEquals(1, result);
 
-        PreparedStatement pst = connection.prepareStatement("SELECT * FROM mausac WHERE mamau = ?");
-        pst.setInt(1, mamauTest);
+        PreparedStatement pst = connection.prepareStatement("SELECT * FROM dungluongrom WHERE madlrom = ?");
+        pst.setInt(1, madlTest);
         ResultSet rs = pst.executeQuery();
 
         assertTrue(rs.next());
@@ -171,78 +171,66 @@ public class MauSacDAOTest {
     /**
      * TC08 - Delete với mã không tồn tại
      * Mục tiêu: Không thực hiện xóa nếu mã không tồn tại
-     * Input: mamau = 9999
+     * Input: madlrom = 9999
      * Expected Output: trả về 0
      */
     @Test
     public void testDeleteIdNotFound() throws Exception {
-        int result = mauSacDAO.delete("9999");
+        int result = dungLuongRomDAO.delete("9999");
         assertEquals(0, result);
     }
 
     /**
      * TC09 - SelectById thành công
-     * Mục tiêu: Trả về đúng bản ghi khi mã màu tồn tại
-     * Input: mamau = 2
-     * Expected Output: DTO có mamau = 2
+     * Mục tiêu: Trả về đúng bản ghi khi mã tồn tại
+     * Input: madlrom = madlTest
+     * Expected Output: DTO có madlrom = madlTest
      */
     @Test
     public void testSelectByIdThanhCong() throws Exception {
-        MauSacDTO result = mauSacDAO.selectById("2");
+        DungLuongRomDTO result = dungLuongRomDAO.selectById(String.valueOf(madlTest));
         assertNotNull(result);
-        assertEquals(2, result.getMamau());
+        assertEquals(madlTest, result.getMadungluongrom());
+        assertEquals(DUNGLUONG_TEST, result.getDungluongrom());
     }
 
     /**
      * TC10 - SelectById với id không tồn tại
-     * Mục tiêu: Không trả về kết quả khi mã màu không tồn tại
-     * Input: mamau = 9999
+     * Mục tiêu: Không trả về kết quả khi mã không tồn tại
+     * Input: madlrom = 9999
      * Expected Output: null
      */
     @Test
     public void testSelectByIdKhongTonTai() {
-        MauSacDTO result = mauSacDAO.selectById("9999");
+        DungLuongRomDTO result = dungLuongRomDAO.selectById("9999");
         assertNull(result);
     }
 
     /**
      * TC11 - SelectAll thành công
-     * Mục tiêu: Lấy danh sách màu có trạng thái = 1
+     * Mục tiêu: Lấy danh sách dung lượng ROM có trạng thái = 1
      * Input: none
      * Expected Output: danh sách > 0 phần tử
      */
     @Test
     public void testSelectAllThanhCong() throws Exception {
-        ArrayList<MauSacDTO> list = mauSacDAO.selectAll();
+        ArrayList<DungLuongRomDTO> list = dungLuongRomDAO.selectAll();
         assertNotNull(list);
         assertTrue(list.size() > 0);
     }
 
     /**
-     * TC12 - GetAll thành công
-     * Mục tiêu: Lấy toàn bộ danh sách màu (kể cả đã bị ẩn)
-     * Input: none
-     * Expected Output: danh sách > 0 phần tử
-     */
-    @Test
-    public void testGetAllThanhCong() throws Exception {
-        ArrayList<MauSacDTO> list = mauSacDAO.getAll();
-        assertNotNull(list);
-        assertTrue(list.size() > 0);
-    }
-
-    /**
-     * TC13 - GetAutoIncrement
-     * Mục tiêu: Lấy đúng giá trị AUTO_INCREMENT từ bảng mausac
+     * TC12 - GetAutoIncrement
+     * Mục tiêu: Lấy đúng giá trị AUTO_INCREMENT từ bảng dungluongrom
      * Input: none
      * Expected Output: trùng khớp với giá trị từ INFORMATION_SCHEMA
      */
     @Test
     public void testGetAutoIncrement() throws Exception {
-        int value = mauSacDAO.getAutoIncrement();
+        int value = dungLuongRomDAO.getAutoIncrement();
 
         PreparedStatement pst = connection.prepareStatement(
-                "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'quanlikhohang' AND TABLE_NAME = 'mausac'");
+                "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'quanlikhohang' AND TABLE_NAME = 'dungluongrom'");
         ResultSet rs = pst.executeQuery();
         rs.next();
         int dbValue = rs.getInt("AUTO_INCREMENT");

@@ -142,11 +142,11 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
             ResultSet rs = (ResultSet) pst.executeQuery();
             while (rs.next()) {
                 String imei = rs.getString("maimei");
-                int macauhinh = rs.getInt("phienbansp");
+                int maphienbansp = rs.getInt("maphienbansp");
                 int maphieunhap = rs.getInt("maphieunhap");
                 int maphieuxuat = rs.getInt("maphieuxuat");
                 int tinhtrang = rs.getInt("tinhtrang");
-                ChiTietSanPhamDTO ct = new ChiTietSanPhamDTO(imei, macauhinh, maphieunhap, maphieuxuat, tinhtrang);
+                ChiTietSanPhamDTO ct = new ChiTietSanPhamDTO(imei, maphienbansp, maphieunhap, maphieuxuat, tinhtrang);
                 result.add(ct);
             }
 //            JDBCUtil.closeConnection(con);
@@ -205,7 +205,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
     public ArrayList<ChiTietSanPhamDTO> selectPBvaTT(int mapbsp,int tt) {
         ArrayList<ChiTietSanPhamDTO> result = new ArrayList<>();
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM ctsanpham where maphienbansp = ? and tinhtrang = ?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, mapbsp);
@@ -220,7 +220,7 @@ public class ChiTietSanPhamDAO implements DAOinterface<ChiTietSanPhamDTO> {
                 ChiTietSanPhamDTO ct = new ChiTietSanPhamDTO(imei, maphienban, maphieunhap, maphieuxuat, tinhtrang);
                 result.add(ct);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (Exception e) {
             System.out.println(e);
         }

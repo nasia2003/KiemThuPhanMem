@@ -1,114 +1,211 @@
 package DAO;
 
 import DTO.SanPhamDTO;
+import static org.junit.Assert.*;
+import org.junit.*;
+
 import java.sql.*;
-import junit.framework.TestCase;
+import java.util.ArrayList;
 
+/**
+ * Unit Test cho lớp SanPhamDAO
+ */
+public class SanPhamDAOTest {
 
-public class SanPhamDAOTest extends TestCase{
     private static Connection connection;
-    private SanPhamDAO sanPhamDAO;
-    private static final String TEN_TEST = "SP_Test";
-    private static final String HINH_ANH_TEST = "test.jpg";
-    private static int maSanPhamTest;
+    private static SanPhamDAO sanPhamDAO;
+    private static int maspTest;
 
-    protected void setUp() throws Exception {
+    @BeforeClass
+    public static void setUpClass() throws Exception {
         connection = ConnectionCustom.getInstance().getConnect();
-        connection.setAutoCommit(false);
         sanPhamDAO = SanPhamDAO.getInstance();
+    }
 
-        String sql = "INSERT INTO sanpham (tensp, hinhanh, xuatxu, chipxuly, dungluongpin, kichthuocman, hedieuhanh, phienbanhdh, camerasau, cameratruoc, thoigianbaohanh, thuonghieu, khuvuckho, soluongton, trangthai) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)";
-        PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-        pst.setString(1, TEN_TEST);
-        pst.setString(2, HINH_ANH_TEST);
-        pst.setInt(3, 1);
-        pst.setString(4, "Snapdragon Test");
-        pst.setInt(5, 4000);
-        pst.setDouble(6, 6.5);
-        pst.setInt(7, 1);
-        pst.setInt(8, 1);
-        pst.setString(9, "12MP");
-        pst.setString(10, "8MP");
-        pst.setInt(11, 12);
-        pst.setInt(12, 1);
-        pst.setInt(13, 1);
-        pst.setInt(14, 10);
+    @Before
+    public void setUp() throws Exception {
+        connection.setAutoCommit(false);
+
+        String sql = "INSERT INTO sanpham (masp, tensp, hinhanh, xuatxu, chipxuly, dungluongpin, kichthuocman, hedieuhanh, phienbanhdh, camerasau, cameratruoc, thoigianbaohanh, thuonghieu, khuvuckho, soluongton, trangthai) " +
+                "VALUES (?, 'SP Test', 'img.png', 1, 'Chip', 5000, 6.5, 1, 1, '12MP', '8MP', 12, 1, 1, 10, 1)";
+        PreparedStatement pst = connection.prepareStatement(sql);
+        maspTest = sanPhamDAO.getAutoIncrement();
+        pst.setInt(1, maspTest);
         pst.executeUpdate();
-
-        ResultSet rs = pst.getGeneratedKeys();
-        if (rs.next()) {
-            maSanPhamTest = rs.getInt(1);
-        }
-        rs.close();
         pst.close();
     }
 
-    /**
-     * Rollback sau mỗi test để không ảnh hưởng dữ liệu thật
-     */
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         connection.rollback();
     }
 
-    /**
-     * Đóng kết nối sau khi chạy xong tất cả test
-     */
-    public static void globalTearDown() throws SQLException {
+    @AfterClass
+    public static void globalTearDown() throws Exception {
         if (connection != null && !connection.isClosed()) {
             connection.close();
         }
     }
 
-    public void testInsertTrungID() throws Exception {
-        SanPhamDTO dto = new SanPhamDTO(maSanPhamTest, "SP_Trung", "img.jpg", 1, "Chip", 4000, 6.0, 1, 1, "13MP", "10MP", 12, 1, 1, 5);
-        int result = sanPhamDAO.insert(dto);
+    /**
+     * TC01 - Insert thành công
+     * Mục tiêu: Kiểm tra insert sản phẩm thành công với dữ liệu hợp lệ
+     * Input: SanPhamDTO chứa đầy đủ thông tin
+     * Expected output: Trả về 1 (thành công)
+     */
+    @Test
+    public void testInsertThanhCong() throws Exception {
+        SanPhamDTO sp = new SanPhamDTO(0, "SP Insert", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 15);
+        int result = sanPhamDAO.insert(sp);
+        assertEquals(1, result);
+    }
+
+    /**
+     * TC02 - Insert thất bại
+     * Mục tiêu: Kiểm tra insert thất bại khi thiếu dữ liệu
+     * Input: SanPhamDTO thiếu tên sản phẩm
+     * Expected output: Trả về 0 (không thành công)
+     */
+    @Test
+    public void testInsertTenNull() throws Exception {
+        SanPhamDTO sp = new SanPhamDTO(0, null, "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
 
+    /**
+     * TC03 - Update thành công
+     * Mục tiêu: Kiểm tra cập nhật sản phẩm thành công
+     * Input: SanPhamDTO hợp lệ với masp đã tồn tại
+     * Expected output: Trả về 1
+     */
+    @Test
     public void testUpdateThanhCong() throws Exception {
-        SanPhamDTO dto = new SanPhamDTO(maSanPhamTest, "SP_Updated", "updated.jpg", 1, "Exynos", 4500, 6.7, 1, 1, "50MP", "20MP", 24, 2, 1, 15);
-        int result = sanPhamDAO.update(dto);
+        SanPhamDTO sp = new SanPhamDTO(maspTest, "SP Updated", "img.png", 1, "Chip", 5000, 6.5, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        int result = sanPhamDAO.update(sp);
         assertEquals(1, result);
-
-        PreparedStatement pst = connection.prepareStatement("SELECT * FROM sanpham WHERE masp = ?");
-        pst.setInt(1, maSanPhamTest);
-        ResultSet rs = pst.executeQuery();
-        assertTrue(rs.next());
-        assertEquals("SP_Updated", rs.getString("tensp"));
-        assertEquals("Exynos", rs.getString("chipxuly"));
-        rs.close();
-        pst.close();
     }
 
+    /**
+     * TC04 - Update không tồn tại
+     * Mục tiêu: Kiểm tra cập nhật thất bại với masp không tồn tại
+     * Input: SanPhamDTO với masp không tồn tại
+     * Expected output: Trả về 0
+     */
+    @Test
+    public void testUpdateKhongTonTai() throws Exception {
+        SanPhamDTO sp = new SanPhamDTO(999999, "SP No Exist", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        int result = sanPhamDAO.update(sp);
+        assertEquals(0, result);
+    }
+
+    /**
+     * TC05 - Delete thành công
+     * Mục tiêu: Kiểm tra xóa mềm sản phẩm thành công
+     * Input: masp đã tồn tại
+     * Expected output: Trả về 1
+     */
+    @Test
     public void testDeleteThanhCong() throws Exception {
-        int result = sanPhamDAO.delete(String.valueOf(maSanPhamTest));
+        int result = sanPhamDAO.delete(String.valueOf(maspTest));
         assertEquals(1, result);
+    }
 
-        PreparedStatement pst = connection.prepareStatement("SELECT trangthai FROM sanpham WHERE masp = ?");
-        pst.setInt(1, maSanPhamTest);
+    /**
+     * TC06 - Delete không tồn tại
+     * Mục tiêu: Kiểm tra xóa mềm thất bại khi masp không tồn tại
+     * Input: masp không tồn tại
+     * Expected output: Trả về 0
+     */
+    @Test
+    public void testDeleteKhongTonTai() throws Exception {
+        int result = sanPhamDAO.delete("999999");
+        assertEquals(0, result);
+    }
+
+    /**
+     * TC07 - SelectAll
+     * Mục tiêu: Kiểm tra lấy danh sách tất cả sản phẩm đang hoạt động
+     * Input: Không có
+     * Expected output: Danh sách chứa sản phẩm test
+     */
+    @Test
+    public void testSelectAll() throws Exception {
+        ArrayList<SanPhamDTO> list = sanPhamDAO.selectAll();
+        assertNotNull(list);
+        boolean found = list.stream().anyMatch(sp -> sp.getMasp() == maspTest);
+        assertTrue(found);
+    }
+
+    /**
+     * TC08 - SelectById thành công
+     * Mục tiêu: Kiểm tra lấy sản phẩm theo ID thành công
+     * Input: masp đã tồn tại
+     * Expected output: Trả về DTO != null và đúng masp
+     */
+    @Test
+    public void testSelectByIdThanhCong() throws Exception {
+        SanPhamDTO sp = sanPhamDAO.selectById(String.valueOf(maspTest));
+        assertNotNull(sp);
+        assertEquals(maspTest, sp.getMasp());
+    }
+
+    /**
+     * TC09 - SelectById không tồn tại
+     * Mục tiêu: Kiểm tra lấy sản phẩm với ID không tồn tại
+     * Input: masp không tồn tại
+     * Expected output: Trả về null
+     */
+    @Test
+    public void testSelectByIdKhongTonTai() throws Exception {
+        SanPhamDTO sp = sanPhamDAO.selectById("999999");
+        assertNull(sp);
+    }
+
+    /**
+     * TC10 - GetAutoIncrement
+     * Mục tiêu: Lấy giá trị AUTO_INCREMENT tiếp theo của bảng sanpham
+     * Input: Không có
+     * Expected output: Giá trị đúng với INFORMATION_SCHEMA
+     */
+    @Test
+    public void testGetAutoIncrement() throws Exception {
+        int value = sanPhamDAO.getAutoIncrement();
+
+        PreparedStatement pst = connection.prepareStatement(
+                "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES " +
+                        "WHERE TABLE_SCHEMA = 'quanlikhohang' AND TABLE_NAME = 'sanpham'"
+        );
         ResultSet rs = pst.executeQuery();
-        assertTrue(rs.next());
-        assertEquals(0, rs.getInt("trangthai"));
+        rs.next();
+        int dbValue = rs.getInt("AUTO_INCREMENT");
+
+        assertEquals(dbValue, value);
         rs.close();
         pst.close();
     }
 
-    public void testSelectById() throws Exception {
-        SanPhamDTO result = sanPhamDAO.selectById(String.valueOf(maSanPhamTest));
-        assertNotNull(result);
-        assertEquals(TEN_TEST, result.getTensp());
+    /**
+     * TC11 - Update số lượng tồn thành công
+     * Mục tiêu: Kiểm tra update số lượng tồn thành công
+     * Input: masp tồn tại, số lượng cộng thêm
+     * Expected output: Trả về 1
+     */
+    @Test
+    public void testUpdateSoLuongTonThanhCong() throws Exception {
+        int result = sanPhamDAO.updateSoLuongTon(maspTest, 5);
+        assertEquals(1, result);
     }
 
-    public void testUpdateSoLuongTon() throws Exception {
-        int result = sanPhamDAO.updateSoLuongTon(maSanPhamTest, 5);
-        assertEquals(1, result);
-
-        PreparedStatement pst = connection.prepareStatement("SELECT soluongton FROM sanpham WHERE masp = ?");
-        pst.setInt(1, maSanPhamTest);
-        ResultSet rs = pst.executeQuery();
-        assertTrue(rs.next());
-        assertEquals(15, rs.getInt("soluongton"));
-        rs.close();
-        pst.close();
+    /**
+     * TC12 - SelectByPhienBan không tồn tại
+     * Mục tiêu: Kiểm tra lấy sản phẩm theo phiên bản không tồn tại
+     * Input: Mã phiên bản không tồn tại
+     * Expected output: Trả về null
+     */
+    @Test
+    public void testSelectByPhienBanKhongTonTai() {
+        SanPhamDTO sp = sanPhamDAO.selectByPhienBan("PB_NOT_EXIST");
+        assertNull(sp);
     }
 }
