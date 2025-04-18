@@ -4,6 +4,8 @@
  */
 package DTO;
 
+import DAO.PhieuXuatDAO;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 public class PhieuXuatDTO extends PhieuDTO{
     private int makh;
 
+    public PhieuXuatDTO() {};
     public PhieuXuatDTO(int makh) {
         this.makh = makh;
     }

@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import DTO.KhachHangDTO;
 
 public class KhachHangDAO implements DAOinterface<KhachHangDTO> {
-
+    public static Connection con = ConnectionCustom.getInstance().getConnect();
     public static KhachHangDAO getInstance() {
         return new KhachHangDAO();
     }
@@ -25,7 +25,7 @@ public class KhachHangDAO implements DAOinterface<KhachHangDTO> {
     public int insert(KhachHangDTO t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "INSERT INTO `khachhang`(`makh`, `tenkhachhang`, `diachi`,`sdt`, `trangthai`) VALUES (?,?,?,?,1)";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, t.getMaKH());
@@ -33,7 +33,7 @@ public class KhachHangDAO implements DAOinterface<KhachHangDTO> {
             pst.setString(3, t.getDiachi());
             pst.setString(4, t.getSdt());
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(KhachHangDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -44,7 +44,7 @@ public class KhachHangDAO implements DAOinterface<KhachHangDTO> {
     public int update(KhachHangDTO t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "UPDATE `khachhang` SET `makh`=?,`tenkhachhang`=?,`diachi`=?,`sdt`=? WHERE makh=?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, t.getMaKH());
@@ -54,7 +54,7 @@ public class KhachHangDAO implements DAOinterface<KhachHangDTO> {
             pst.setInt(5, t.getMaKH());
             
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(KhachHangDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -65,12 +65,12 @@ public class KhachHangDAO implements DAOinterface<KhachHangDTO> {
     public int delete(String t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "UPDATE  `khachhang` SET trangthai=0 WHERE `makh` = ?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setString(1, t);
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(KhachHangDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -81,7 +81,7 @@ public class KhachHangDAO implements DAOinterface<KhachHangDTO> {
     public ArrayList<KhachHangDTO> selectAll() {
         ArrayList<KhachHangDTO> result = new ArrayList<KhachHangDTO>();
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM khachhang WHERE trangthai=1";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             ResultSet rs = (ResultSet) pst.executeQuery();
@@ -94,7 +94,7 @@ public class KhachHangDAO implements DAOinterface<KhachHangDTO> {
                 KhachHangDTO kh = new KhachHangDTO(makh, tenkhachhang, sdt, diachi,ngaythamgia);
                 result.add(kh);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -105,7 +105,7 @@ public class KhachHangDAO implements DAOinterface<KhachHangDTO> {
     public KhachHangDTO selectById(String t) {
         KhachHangDTO result = null;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM khachhang WHERE makh=?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setString(1, t);
@@ -118,7 +118,7 @@ public class KhachHangDAO implements DAOinterface<KhachHangDTO> {
                 Date ngaythamgia = rs.getDate("ngaythamgia");
                 result = new KhachHangDTO(makh, tenkhachhang, sdt, diachi,ngaythamgia);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -129,7 +129,7 @@ public class KhachHangDAO implements DAOinterface<KhachHangDTO> {
     public int getAutoIncrement() {
         int result = -1;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT `AUTO_INCREMENT` FROM  INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'quanlikhohang' AND   TABLE_NAME   = 'khachhang'";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             ResultSet rs2 = pst.executeQuery(sql);

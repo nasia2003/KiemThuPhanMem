@@ -15,6 +15,7 @@ import java.sql.ResultSet;
  * @author Tran Nhat Sinh
  */
 public class ChiTietPhieuXuatDAO implements ChiTietInterface<ChiTietPhieuDTO> {
+    public static Connection con = ConnectionCustom.getInstance().getConnect();
 
     public static ChiTietPhieuXuatDAO getInstance() {
         return new ChiTietPhieuXuatDAO();
@@ -25,7 +26,7 @@ public class ChiTietPhieuXuatDAO implements ChiTietInterface<ChiTietPhieuDTO> {
         int result = 0;
         for (int i = 0; i < t.size(); i++) {
             try {
-                Connection con = (Connection) JDBCUtil.getConnection();
+//                Connection con = (Connection) JDBCUtil.getConnection();
                 String sql = "INSERT INTO `ctphieuxuat`(`maphieuxuat`, `maphienbansp`, `soluong`, `dongia`) VALUES (?,?,?,?)";
                 PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
                 pst.setInt(1, t.get(i).getMaphieu());
@@ -35,7 +36,7 @@ public class ChiTietPhieuXuatDAO implements ChiTietInterface<ChiTietPhieuDTO> {
                 int change = PhienBanSanPhamDAO.getInstance().updateSoLuongTon(t.get(i).getMaphienbansp(), soluong);
                 pst.setInt(4, t.get(i).getDongia());
                 result = pst.executeUpdate();
-                JDBCUtil.closeConnection(con);
+//                JDBCUtil.closeConnection(con);
             } catch (SQLException ex) {
                 Logger.getLogger(ChiTietPhieuXuatDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -56,12 +57,12 @@ public class ChiTietPhieuXuatDAO implements ChiTietInterface<ChiTietPhieuDTO> {
     public int delete(String t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "DELETE FROM ctphieuxuat WHERE maphieuxuat = ?";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setString(1, t);
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(ChiTietPhieuXuatDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -81,7 +82,7 @@ public class ChiTietPhieuXuatDAO implements ChiTietInterface<ChiTietPhieuDTO> {
     public ArrayList<ChiTietPhieuDTO> selectAll(String t) {
         ArrayList<ChiTietPhieuDTO> result = new ArrayList<>();
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM ctphieuxuat WHERE maphieuxuat = ?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setString(1, t);
@@ -94,7 +95,7 @@ public class ChiTietPhieuXuatDAO implements ChiTietInterface<ChiTietPhieuDTO> {
                 ChiTietPhieuDTO ctphieu = new ChiTietPhieuDTO(maphieu, maphienbansp, soluong, dongia);
                 result.add(ctphieu);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException e) {
             System.out.println(e);
         }
