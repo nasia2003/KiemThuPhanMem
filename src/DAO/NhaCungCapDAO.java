@@ -18,7 +18,7 @@ public class NhaCungCapDAO implements DAOinterface<NhaCungCapDTO>{
     public static NhaCungCapDAO getInstance(){
         return new NhaCungCapDAO();
     }
-
+    public Connection con = ConnectionCustom.getInstance().getConnect();
     @Override
     public int insert(NhaCungCapDTO t) {
         int result = 0 ;
@@ -142,4 +142,5 @@ public class NhaCungCapDAO implements DAOinterface<NhaCungCapDTO>{
         }
         return result;
     }
+
 }

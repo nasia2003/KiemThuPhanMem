@@ -14,6 +14,7 @@ import DTO.ChiTietPhieuDTO;
  */
 public class ChiTietPhieuNhapDTO extends ChiTietPhieuDTO{
     private int phuongthucnnhap;
+    public ChiTietPhieuNhapDTO(){};
 
     public ChiTietPhieuNhapDTO(int phuongthucnnhap) {
         this.phuongthucnnhap = phuongthucnnhap;

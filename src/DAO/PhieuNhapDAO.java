@@ -23,7 +23,7 @@ public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
     public static PhieuNhapDAO getInstance() {
         return new PhieuNhapDAO();
     }
-    
+    public Connection con = ConnectionCustom.getInstance().getConnect();
     
     @Override
     public int insert(PhieuNhapDTO t) {
@@ -225,5 +225,7 @@ public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
         }
         return result;
     }
+
+
 
 }

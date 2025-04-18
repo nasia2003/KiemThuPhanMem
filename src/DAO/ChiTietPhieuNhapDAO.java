@@ -19,7 +19,7 @@ public class ChiTietPhieuNhapDAO implements ChiTietInterface<ChiTietPhieuNhapDTO
     public static ChiTietPhieuNhapDAO getInstance() {
         return new ChiTietPhieuNhapDAO();
     }
-
+    public Connection con = ConnectionCustom.getInstance().getConnect();
     @Override
     public int insert(ArrayList<ChiTietPhieuNhapDTO> t) {
         int result = 0;
