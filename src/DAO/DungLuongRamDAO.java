@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import java.util.ArrayList;
 
 public class DungLuongRamDAO implements DAOinterface<DungLuongRamDTO> {
+    public static Connection con = ConnectionCustom.getInstance().getConnect();
 
     public static DungLuongRamDAO getInstance() {
         return new DungLuongRamDAO();
@@ -24,13 +25,13 @@ public class DungLuongRamDAO implements DAOinterface<DungLuongRamDTO> {
     public int insert(DungLuongRamDTO t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "INSERT INTO `dungluongram`(`madlram`, `kichthuocram`,`trangthai`) VALUES (?,?,1)";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, t.getMadlram());
             pst.setInt(2, t.getDungluongram());
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(DungLuongRamDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -41,13 +42,13 @@ public class DungLuongRamDAO implements DAOinterface<DungLuongRamDTO> {
     public int update(DungLuongRamDTO t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "UPDATE `dungluongram` SET `kichthuocram`=? WHERE `madlram`=?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, t.getDungluongram());
             pst.setInt(2, t.getMadlram());
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(DungLuongRamDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -58,12 +59,12 @@ public class DungLuongRamDAO implements DAOinterface<DungLuongRamDTO> {
     public int delete(String t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "UPDATE `dungluongram` SET trangthai = 0 WHERE madlram = ?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setString(1, t);
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
             Logger.getLogger(DungLuongRamDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -74,7 +75,7 @@ public class DungLuongRamDAO implements DAOinterface<DungLuongRamDTO> {
     public ArrayList<DungLuongRamDTO> selectAll() {
         ArrayList<DungLuongRamDTO> result = new ArrayList<>();
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM dungluongram WHERE trangthai = 1";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             ResultSet rs = (ResultSet) pst.executeQuery();
@@ -84,7 +85,7 @@ public class DungLuongRamDAO implements DAOinterface<DungLuongRamDTO> {
                 DungLuongRamDTO dlr = new DungLuongRamDTO(maram, kichthuocram);
                 result.add(dlr);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (Exception e) {
         }
         return result;
@@ -94,7 +95,7 @@ public class DungLuongRamDAO implements DAOinterface<DungLuongRamDTO> {
     public DungLuongRamDTO selectById(String t) {
         DungLuongRamDTO result = null;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT * FROM dungluongram WHERE madlram=?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setString(1, t);
@@ -104,7 +105,7 @@ public class DungLuongRamDAO implements DAOinterface<DungLuongRamDTO> {
                 int kichthuoram = rs.getInt("kichthuocram");
                 result = new DungLuongRamDTO(madlram, kichthuoram);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
         } catch (SQLException e) {
         }
         return result;
@@ -114,7 +115,7 @@ public class DungLuongRamDAO implements DAOinterface<DungLuongRamDTO> {
     public int getAutoIncrement() {
         int result = -1;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+//            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "SELECT `AUTO_INCREMENT` FROM  INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'quanlikhohang' AND   TABLE_NAME   = 'dungluongram'";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             ResultSet rs2 = pst.executeQuery(sql);

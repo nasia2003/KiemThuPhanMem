@@ -32,6 +32,8 @@ public class ThuongHieuDTO {
         this.tenthuonghieu = tenthuonghieu;
     }
 
+
+
     @Override
     public String toString() {
         return "LoaiHangDTO{" + "mathuonghieu=" + mathuonghieu + ", tenthuonghieu=" + tenthuonghieu + '}';
