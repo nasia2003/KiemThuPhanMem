@@ -60,7 +60,7 @@ public class MenuTaskbar extends JPanel {
         {"Thống kê", "statistical.svg", "thongke"},
         {"Phân quyền", "permission.svg", "nhomquyen"},
         {"Đăng xuất", "log_out.svg", "dangxuat"},
-            {"Phiếu kiểm kê", "", "phieukiemke"},
+//            {"Phiếu kiểm kê", "", "phieukiemke"},
     };
 
     Main main;
@@ -212,13 +212,13 @@ public class MenuTaskbar extends JPanel {
                 main.setPanel(quanLyKho);
             }
         });
-        listitem[13].addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent evt) {
-                PhieuKiemKe kiemKe = new PhieuKiemKe(main, nhanVienDTO);
-                main.setPanel(kiemKe);
-            }
-        });
+//        listitem[13].addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mousePressed(MouseEvent evt) {
+//                PhieuKiemKe kiemKe = new PhieuKiemKe(main, nhanVienDTO);
+//                main.setPanel(kiemKe);
+//            }
+//        });
 
         listitem[4].addMouseListener(new MouseAdapter() {
             @Override
