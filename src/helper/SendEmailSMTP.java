@@ -13,8 +13,8 @@ public class SendEmailSMTP {
     }
     
     public static void sendOTP(String emailTo, String otp) {
-        String username = "tsinh11111@gmail.com";
-        String password = "ojldjxeqzmdxznbh";
+        String username = "rimrimm23@gmail.com";
+        String password = "meuwfghfrxpzqkuu";
         Properties prop = new Properties();
         prop.put("mail.smtp.host", "smtp.gmail.com");
         prop.put("mail.smtp.port", "587");
