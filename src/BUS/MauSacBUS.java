@@ -83,8 +83,8 @@ public class MauSacBUS {
     public boolean checkDup(String name) {
         boolean check = true;
         int i = 0;
-        while (i <= this.listMauSac.size() && check == true) {
-            if (this.listMauSac.get(i).getTenmau().toLowerCase().contains(name.toLowerCase())) {
+        while (i < this.listMauSac.size() && check == true) {
+            if (this.listMauSac.get(i).getTenmau().toLowerCase().equals(name.toLowerCase())) {
                 check = false;
             } else {
                 i++;

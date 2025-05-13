@@ -18,6 +18,7 @@ import GUI.Component.InputForm;
 import GUI.Component.InputImage;
 import GUI.Component.NumericDocumentFilter;
 import GUI.Component.SelectForm;
+import GUI.Panel.PhieuXuat;
 import GUI.Panel.SanPham;
 import helper.Formater;
 import helper.Validation;
@@ -400,14 +401,18 @@ public final class SanPhamDialog extends JDialog implements ActionListener {
             SanPhamDAO.getInstance().update(sp);
             this.jpSP.spBUS.update(snNew);
             this.jpSP.loadDataTalbe(this.jpSP.spBUS.getAll());
-            int input = JOptionPane.showConfirmDialog(this, 
-                "Bạn có muốn chỉnh sửa chi tiết sản phẩm?", "Chỉnh sửa chi tiết", 
-                JOptionPane.OK_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE);
-            // 0=ok, 2=cancel
-            if(input == 0){
-                CardLayout c = (CardLayout) pnmain.getLayout();
-                c.next(pnmain);
-            }
+//            int input = JOptionPane.showConfirmDialog(this,
+//                "Bạn có muốn chỉnh sửa chi tiết sản phẩm?", "Chỉnh sửa chi tiết",
+//                JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+//            // 0=ok, 2=cancel
+//            if(input == 0){
+//                CardLayout c = (CardLayout) pnmain.getLayout();
+//                c.next(pnmain);
+//            }
+            JOptionPane.showMessageDialog(this, "Lưu thành công!");
+            loadDataToTableCauHinh(this.listch);
+            resetFormCauHinh();
+            dispose();
         }
         if(source == btnEditCTCauHinhEdit){
             if (validateCardTwo()) {

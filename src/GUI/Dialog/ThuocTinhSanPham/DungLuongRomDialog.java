@@ -112,6 +112,7 @@ public class DungLuongRomDialog extends JDialog implements MouseListener {
         del = new ButtonCustom("Xóa", "danger", 15, 100, 40);
         del.addMouseListener(this);
         update = new ButtonCustom("Sửa", "success", 15, 100, 40);
+        update.addMouseListener(this);
         bottom.setBackground(Color.white);
         bottom.setLayout(new FlowLayout(1, 20, 20));
         bottom.add(add);
@@ -160,18 +161,16 @@ public class DungLuongRomDialog extends JDialog implements MouseListener {
         } else if (e.getSource() == update) {
             int index = getRowSelected();
             if (index != -1) {
-                if (e.getSource() == add) {
-                    if (Validation.isEmpty(ms.getText())) {
-                        JOptionPane.showMessageDialog(this, "Vui lòng nhập dung lượng Rom");
+                if (Validation.isEmpty(ms.getText())) {
+                    JOptionPane.showMessageDialog(this, "Vui lòng nhập dung lượng Rom");
+                } else {
+                    int kichthuoc = Integer.parseInt(ms.getText());
+                    if (dlrBUS.checkDup(kichthuoc)) {
+                        dlrBUS.update(new DungLuongRomDTO(list.get(index).getMadungluongrom(), kichthuoc));
+                        loadDataTable(list);
+                        ms.setText("");
                     } else {
-                        int kichthuoc = Integer.parseInt(ms.getText());
-                        if (dlrBUS.checkDup(kichthuoc)) {
-                            dlrBUS.update(new DungLuongRomDTO(list.get(index).getMadungluongrom(), kichthuoc));
-                            loadDataTable(list);
-                            ms.setText("");
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Dung lượng ROM đã tồn tại !");
-                        }
+                        JOptionPane.showMessageDialog(this, "Dung lượng ROM đã tồn tại !");
                     }
                 }
             }

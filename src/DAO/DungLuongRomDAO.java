@@ -51,7 +51,7 @@ public class DungLuongRomDAO implements DAOinterface<DungLuongRomDTO> {
             String sql = "UPDATE `dungluongrom` SET `kichthuocrom`=? WHERE `madlrom`=?";
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setInt(1, t.getDungluongrom());
-            pst.setInt(2, t.getDungluongrom());
+            pst.setInt(2, t.getMadungluongrom());
             result = pst.executeUpdate();
 //            JDBCUtil.closeConnection(con);
         } catch (SQLException ex) {
