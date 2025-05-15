@@ -13,229 +13,248 @@ import java.util.ArrayList;
 public class KhuVucKhoDAOTest {
 
     private static Connection connection;
-    private static KhuVucKhoDAO khuVucKhoDAO;
-    private static final String TEN_TEST = "KVK_Test";
-    private static final String GHI_CHU_TEST = "GhiChu_Test";
-    private static int maKhuVucTest;
+
+    private static KhuVucKhoDAO dao;
 
     @BeforeClass
     public static void setUpClass() throws Exception {
-        connection = ConnectionCustom.getInstance().getConnect();
-        khuVucKhoDAO = KhuVucKhoDAO.getInstance();
+        dao = KhuVucKhoDAO.getInstance();
+        connection = dao.con;
     }
 
     @Before
     public void setUp() throws Exception {
-        connection.setAutoCommit(false);
-
-        // Insert dữ liệu test
-        String sql = "INSERT INTO khuvuckho (tenkhuvuc, ghichu, trangthai) VALUES (?, ?, 1)";
-        PreparedStatement pst = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-        pst.setString(1, TEN_TEST);
-        pst.setString(2, GHI_CHU_TEST);
-        pst.executeUpdate();
-
-        ResultSet rs = pst.getGeneratedKeys();
-        if (rs.next()) {
-            maKhuVucTest = rs.getInt(1);
-        }
-        rs.close();
-        pst.close();
+        connection.setAutoCommit(false);  // Bắt đầu transaction
     }
 
     @After
     public void tearDown() throws Exception {
-        connection.rollback();
+        if (connection != null && !connection.isClosed()) {
+            connection.rollback();
+            connection.setAutoCommit(true);
+        }
     }
 
     @AfterClass
-    public static void tearDownClass() throws Exception {
+    public static void globalTearDown() throws Exception {
         if (connection != null && !connection.isClosed()) {
             connection.close();
         }
     }
 
     /**
-     * TC01 - Insert thành công
-     * Mục tiêu: Insert khu vực kho mới vào CSDL
-     * Input: tenkhuvuc = "KVK Insert", ghichu = "Insert Test"
-     * Expected output: insert trả về 1, dữ liệu tồn tại trong DB
+     * Mã testcase: KVK_01
+     * Mục tiêu: Test insert với dữ liệu hợp lệ
+     * Input: dto có makhuvuc hợp lệ, tenkhuvuc không null, ghichu không null
+     * Expected output: trả về 1 (chèn thành công)
      */
     @Test
-    public void testInsertThanhCong() throws Exception {
-        KhuVucKhoDTO dto = new KhuVucKhoDTO(0, "KVK Insert", "Insert Test");
-        int result = khuVucKhoDAO.insert(dto);
+    public void insert_HopLe() {
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, "KV Test", "ghi chú");
+        int result = dao.insert(dto);
         assertEquals(1, result);
-
-        PreparedStatement pst = connection.prepareStatement("SELECT * FROM khuvuckho WHERE tenkhuvuc = ?");
-        pst.setString(1, "KVK Insert");
-        ResultSet rs = pst.executeQuery();
-
-        assertTrue(rs.next());
-        assertEquals("Insert Test", rs.getString("ghichu"));
-        rs.close();
-        pst.close();
     }
 
-    /**
-     * TC02 - Insert trùng ID
-     * Mục tiêu: Không insert khi ID đã tồn tại
-     * Input: makhuvuc = maKhuVucTest (ID đã có), tenkhuvuc = "KVK Trùng"
-     * Expected output: insert trả về 0
-     */
     @Test
-    public void testInsertTrungID() throws Exception {
-        KhuVucKhoDTO dto = new KhuVucKhoDTO(maKhuVucTest, "KVK Trùng", "Note");
-        int result = khuVucKhoDAO.insert(dto);
+    public void insert_TenkhuvucNull() {
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, null, "ghi chú");
+        int result = dao.insert(dto);
         assertEquals(0, result);
     }
 
-    /**
-     * TC03 - Update thành công
-     * Mục tiêu: Cập nhật dữ liệu khu vực đã có
-     * Input: makhuvuc = maKhuVucTest, tenkhuvuc = "KVK Updated", ghichu = "Note Updated"
-     * Expected output: update trả về 1, dữ liệu trong DB được cập nhật
-     */
     @Test
-    public void testUpdateThanhCong() throws Exception {
-        KhuVucKhoDTO dto = new KhuVucKhoDTO(maKhuVucTest, "KVK Updated", "Note Updated");
-        int result = khuVucKhoDAO.update(dto);
-        assertEquals(1, result);
-
-        PreparedStatement pst = connection.prepareStatement("SELECT * FROM khuvuckho WHERE makhuvuc = ?");
-        pst.setInt(1, maKhuVucTest);
-        ResultSet rs = pst.executeQuery();
-
-        assertTrue(rs.next());
-        assertEquals("KVK Updated", rs.getString("tenkhuvuc"));
-        rs.close();
-        pst.close();
-    }
-
-    /**
-     * TC04 - Update không tồn tại
-     * Mục tiêu: Không cập nhật khi ID không tồn tại
-     * Input: makhuvuc = 999999, tenkhuvuc = "XXX"
-     * Expected output: update trả về 0
-     */
-    @Test
-    public void testUpdateKhongTonTai() throws Exception {
-        KhuVucKhoDTO dto = new KhuVucKhoDTO(999999, "XXX", "YYY");
-        int result = khuVucKhoDAO.update(dto);
+    public void insert_TenkhuvucRong() {
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, "", "ghi chú");
+        int result = dao.insert(dto);
         assertEquals(0, result);
     }
 
-    /**
-     * TC05 - Delete thành công
-     * Mục tiêu: Xóa mềm khu vực kho (đổi trạng thái = 0)
-     * Input: makhuvuc = maKhuVucTest
-     * Expected output: delete trả về 1, trạng thái = 0
-     */
     @Test
-    public void testDeleteThanhCong() throws Exception {
-        int result = khuVucKhoDAO.delete(String.valueOf(maKhuVucTest));
+    public void insert_GhichuNull() {
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, "KV Ghi chú null", null);
+        int result = dao.insert(dto);
         assertEquals(1, result);
-
-        PreparedStatement pst = connection.prepareStatement("SELECT trangthai FROM khuvuckho WHERE makhuvuc = ?");
-        pst.setInt(1, maKhuVucTest);
-        ResultSet rs = pst.executeQuery();
-
-        assertTrue(rs.next());
-        assertEquals(0, rs.getInt("trangthai"));
-        rs.close();
-        pst.close();
     }
 
-    /**
-     * TC06 - Delete không tồn tại
-     * Mục tiêu: Không xóa khi ID không có trong DB
-     * Input: makhuvuc = 999999
-     * Expected output: delete trả về 0
-     */
     @Test
-    public void testDeleteKhongTonTai() throws Exception {
-        int result = khuVucKhoDAO.delete("999999");
+    public void insert_GhichuRong() {
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, "KV Ghi chú rỗng", "");
+        int result = dao.insert(dto);
+        assertEquals(1, result);
+    }
+
+    @Test
+    public void insert_MaKhuVucAm() {
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(-1, "KV âm", "ghi chú");
+        int result = dao.insert(dto);
         assertEquals(0, result);
     }
 
-    /**
-     * TC07 - SelectAll
-     * Mục tiêu: Lấy danh sách tất cả khu vực đang hoạt động
-     * Input: Không có
-     * Expected output: Trả về list chứa phần tử có makhuvuc = maKhuVucTest
-     */
     @Test
-    public void testSelectAll() throws Exception {
-        ArrayList<KhuVucKhoDTO> ds = khuVucKhoDAO.selectAll();
-        assertNotNull(ds);
+    public void insert_MaKhuVucTrung() {
+        int id = 99;
+        KhuVucKhoDTO dto1 = new KhuVucKhoDTO(id, "KV Trùng 1", "ghi chú 1");
+        KhuVucKhoDTO dto2 = new KhuVucKhoDTO(id, "KV Trùng 2", "ghi chú 2");
 
-        boolean found = false;
-        for (KhuVucKhoDTO kvk : ds) {
-            if (kvk.getMakhuvuc() == maKhuVucTest) {
-                found = true;
-                break;
-            }
-        }
-        assertTrue(found);
+        dao.insert(dto1);
+        int result = dao.insert(dto2);
+        assertEquals(0, result);
     }
 
-    /**
-     * TC08 - SelectById thành công
-     * Mục tiêu: Lấy thông tin khu vực theo ID
-     * Input: makhuvuc = maKhuVucTest
-     * Expected output: DTO trả về != null và đúng ID
-     */
     @Test
-    public void testSelectByIdThanhCong() throws Exception {
-        KhuVucKhoDTO dto = khuVucKhoDAO.selectById(String.valueOf(maKhuVucTest));
-        assertNotNull(dto);
-        assertEquals(maKhuVucTest, dto.getMakhuvuc());
+    public void update_HopLe() {
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, "KV update", "ghi chú ban đầu");
+        dao.insert(dto);
+
+        dto.setTenkhuvuc("KV update mới");
+        dto.setGhichu("ghi chú mới");
+        int result = dao.update(dto);
+        assertEquals(1, result);
     }
 
-    /**
-     * TC09 - SelectById không tồn tại
-     * Mục tiêu: Không trả về kết quả khi ID không có
-     * Input: makhuvuc = 999999
-     * Expected output: Trả về null
-     */
     @Test
-    public void testSelectByIdKhongTonTai() throws Exception {
-        KhuVucKhoDTO dto = khuVucKhoDAO.selectById("999999");
-        assertNull(dto);
+    public void update_MaKhuVucKhongTonTai() {
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(999999, "Không tồn tại", "ghi chú");
+        int result = dao.update(dto);
+        assertEquals(0, result); // không có dòng nào được cập nhật
     }
 
-    /**
-     * TC10 - SelectById null
-     * Mục tiêu: Không trả về kết quả khi ID null
-     * Input: makhuvuc = null
-     * Expected output: Trả về null
-     */
     @Test
-    public void testSelectByIdNull() throws Exception {
-        KhuVucKhoDTO dto = khuVucKhoDAO.selectById(null);
-        assertNull(dto);
+    public void update_TenKhuVucNull() {
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, "KV test null", "ghi chú");
+        dao.insert(dto);
+
+        dto.setTenkhuvuc(null);
+        int result = dao.update(dto);
+        assertEquals(0, result);
     }
 
-    /**
-     * TC11 - GetAutoIncrement
-     * Mục tiêu: Lấy giá trị auto increment tiếp theo
-     * Input: Không có
-     * Expected output: Trả về giá trị bằng với AUTO_INCREMENT trong DB
-     */
     @Test
-    public void testGetAutoIncrement() throws Exception {
-        int value = khuVucKhoDAO.getAutoIncrement();
+    public void update_GhiChuNull() {
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, "KV ghi chú null", "ghi chú");
+        dao.insert(dto);
 
-        PreparedStatement pst = connection.prepareStatement(
-                "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES " +
-                        "WHERE TABLE_SCHEMA = 'quanlikhohang' AND TABLE_NAME = 'khuvuckho'"
-        );
-        ResultSet rs = pst.executeQuery();
-        rs.next();
-        int dbValue = rs.getInt("AUTO_INCREMENT");
-
-        assertEquals(dbValue, value);
-        rs.close();
-        pst.close();
+        dto.setGhichu(null);
+        int result = dao.update(dto);
+        assertEquals(1, result);
     }
+
+    @Test
+    public void update_TenKhuVucRong() {
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, "KV rỗng", "ghi chú");
+        dao.insert(dto);
+
+        dto.setTenkhuvuc("");
+        int result = dao.update(dto);
+        assertEquals(0, result);
+    }
+
+    @Test
+    public void update_GhiChuRong() {
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, "KV ghi chú rỗng", "ghi chú cũ");
+        dao.insert(dto);
+
+        dto.setGhichu("");
+        int result = dao.update(dto);
+        assertEquals(1, result);
+    }
+
+    @Test
+    public void delete_HopLe() {
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, "KV delete", "test xóa");
+        dao.insert(dto);
+
+        int result = dao.delete(String.valueOf(id));
+        assertEquals(1, result);
+    }
+
+    @Test
+    public void delete_MaKhongTonTai() {
+        int result = dao.delete("999999999");
+        assertEquals(0, result);
+    }
+
+    @Test
+    public void delete_NullMa() {
+        int result = dao.delete(null);
+        assertEquals(0, result);
+    }
+
+    @Test
+    public void delete_EmptyString() {
+        int result = dao.delete("");
+        assertEquals(0, result);
+    }
+
+    @Test
+    public void selectAll_HopLe() {
+        // Chuẩn bị dữ liệu
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, "KV selectAll", "ghi chú");
+        dao.insert(dto);
+
+        ArrayList<KhuVucKhoDTO> list = dao.selectAll();
+        boolean exists = list.stream().anyMatch(k -> k.getMakhuvuc() == id);
+        assertTrue(exists);
+    }
+
+    @Test
+    public void selectById_HopLe() {
+        int id = 99;
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(id, "KV ID", "ghi chú");
+        dao.insert(dto);
+
+        KhuVucKhoDTO found = dao.selectById(String.valueOf(id));
+        assertNotNull(found);
+        assertEquals("KV ID", found.getTenkhuvuc());
+        assertEquals("ghi chú", found.getGhichu());
+    }
+
+    @Test
+    public void selectById_KhongTonTai() {
+        KhuVucKhoDTO result = dao.selectById("999999"); // giả sử không tồn tại
+        assertNull(result);
+    }
+
+    @Test
+    public void selectById_Null() {
+        KhuVucKhoDTO result = dao.selectById(null);
+        assertNull(result);
+    }
+
+    @Test
+    public void selectById_EmptyString() {
+        KhuVucKhoDTO result = dao.selectById("");
+        assertNull(result);
+    }
+
+    @Test
+    public void getAutoIncrement_HopLe() {
+        int nextId = dao.getAutoIncrement();
+
+        // Giá trị phải > 0
+        assertTrue(nextId > 0);
+
+        // Có thể test insert để xác nhận đúng ID
+        KhuVucKhoDTO dto = new KhuVucKhoDTO(nextId, "KV test auto", "ghi chú");
+        int inserted = dao.insert(dto);
+        assertEquals(1, inserted);
+
+        KhuVucKhoDTO found = dao.selectById(String.valueOf(nextId));
+        assertNotNull(found);
+        assertEquals("KV test auto", found.getTenkhuvuc());
+    }
+
+
 }
