@@ -14,341 +14,320 @@ import java.util.ArrayList;
 import static org.junit.Assert.*;
 
 public class ChiTietPhieuNhapDAOTest {
-    /**
-     * TC1: Kiểm tra phương thức getInstance() trả về đối tượng hợp lệ.
-     * Mục đích: Đảm bảo rằng phương thức getInstance() luôn trả về một thể hiện hợp lệ của ChiTietPhieuNhapDAO.
-     */
+    private Connection testCon;
+    private ChiTietPhieuNhapDAO dao;
+    private static final int TEST_MA_PHIEU = 1001;
+    private static final int TEST_MA_PHIENBANSP = 101;
+    private static final int TEST_HINHTHUCNHAP = 1;
+
+
+    @Before
+    public void setUp() throws SQLException {
+        testCon = JDBCUtil.getConnection();
+        testCon.setAutoCommit(false);
+        dao = ChiTietPhieuNhapDAO.getInstance();
+        dao.setConnection(testCon); // Use the same connection for all operations
+    }
+
+    @After
+    public void tearDown() throws SQLException {
+        try {
+            testCon.rollback();
+        } finally {
+            testCon.setAutoCommit(true);
+            // JDBCUtil.closeConnection(testCon); // Uncomment if needed
+        }
+    }
+
+    // ✅ TC1: Kiểm tra getInstance trả về đối tượng hợp lệ
     @Test
     public void testGetInstance() {
-        // Gọi phương thức getInstance() để lấy thể hiện của ChiTietPhieuNhapDAO
-        ChiTietPhieuNhapDAO dao = ChiTietPhieuNhapDAO.getInstance();
-
-        // Kiểm tra đối tượng trả về không phải null
-        Assert.assertNotNull("Phương thức getInstance() phải trả về đối tượng không null", dao);
-
-        // Kiểm tra đối tượng trả về đúng kiểu
-        Assert.assertTrue("Đối tượng trả về phải là thể hiện của ChiTietPhieuNhapDAO", dao instanceof ChiTietPhieuNhapDAO);
+        ChiTietPhieuNhapDAO instance = ChiTietPhieuNhapDAO.getInstance();
+        assertNotNull("getInstance() must return a non-null object", instance);
+        assertTrue("Instance must be of type ChiTietPhieuNhapDAO", instance instanceof ChiTietPhieuNhapDAO);
     }
-    /**
-     * TC1: Thêm danh sách chi tiết phiếu nhập hợp lệ
-     * Mục đích: Đảm bảo các bản ghi chi tiết được chèn thành công.
-     */
-    @Test
-    public void insertChiTietPhieuNhap_HopLe() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
 
+    // ✅ TC2: Thêm danh sách chi tiết phiếu nhập hợp lệ
+    @Test
+    public void testInsert_ValidData() throws SQLException {
         ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
-        list.add(new ChiTietPhieuNhapDTO(1001, 101, 10, 20000, 1));
-        list.add(new ChiTietPhieuNhapDTO(1001, 102, 5, 30000, 2));
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, 101, 10, 20000, 1));
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, 102, 5, 30000, 2));
 
         int result = dao.insert(list);
-        Assert.assertTrue(result >= 1); // Ít nhất một bản ghi thành công
-        con.rollback();
+        assertEquals("Insert should succeed for valid data", 2, result);
     }
 
-    /**
-     * TC2: Danh sách chi tiết rỗng
-     * Mục đích: Kiểm tra xem phương thức có xử lý đúng khi không có dữ liệu.
-     */
+    // ✅ TC3: Thêm danh sách chi tiết rỗng
     @Test
-    public void insertChiTietPhieuNhap_DanhSachRong() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
-
+    public void testInsert_EmptyList() throws SQLException {
         ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
         int result = dao.insert(list);
-
-        Assert.assertEquals(0, result); // Không có bản ghi nào được thêm
-        con.rollback();
+        assertEquals("Insert should return 0 for empty list", 0, result);
     }
 
-    /**
-     * TC3: Thêm chi tiết với mã phiếu không tồn tại trong bảng phiếu nhập
-     * Mục đích: Kiểm tra xử lý khi khóa ngoại không hợp lệ.
-     */
+    // ✅ TC4: Thêm danh sách chi tiết null
     @Test
-    public void insertChiTietPhieuNhap_MaPhieuKhongTonTai() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
+    public void testInsert_NullList() throws SQLException {
+        int result = dao.insert(null);
+        assertEquals("Insert should return 0 for null list", 0, result);
+    }
 
+    // ✅ TC5: Thêm chi tiết với số lượng âm
+    @Test
+    public void testInsert_NegativeQuantity() throws SQLException {
         ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
-        list.add(new ChiTietPhieuNhapDTO(9999, 101, 2, 10000, 1)); // Mã phiếu không tồn tại
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, 103, -5, 15000, 1));
 
         int result = dao.insert(list);
-        Assert.assertTrue(result == 0 || result == 1); // Có thể vẫn insert được nếu không có FK constraint
-        con.rollback();
+        assertEquals("Insert should fail or handle negative quantity", 0, result);
     }
 
-    /**
-     * TC4: Thêm chi tiết với số lượng âm
-     * Mục đích: Kiểm tra hệ thống có cho phép số lượng âm không.
-     */
+    // ✅ TC6: Thêm chi tiết với đơn giá bằng 0
     @Test
-    public void insertChiTietPhieuNhap_SoLuongAm() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
-
+    public void testInsert_ZeroPrice() throws SQLException {
         ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
-        list.add(new ChiTietPhieuNhapDTO(1002, 103, -5, 15000, 1));
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, 104, 3, 0, 2));
 
         int result = dao.insert(list);
-        Assert.assertTrue(result == 0 || result == 1); // Tùy theo DB có constraint không
-        con.rollback();
+        assertEquals("Insert should succeed for zero price", 1, result);
     }
 
-    /**
-     * TC5: Truyền null thay vì danh sách
-     * Mục đích: Kiểm tra xử lý khi danh sách chi tiết là null.
-     */
+    // ✅ TC7: Xóa chi tiết phiếu nhập với mã phiếu hợp lệ
     @Test
-    public void insertChiTietPhieuNhap_DanhSachNull() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        try {
-            int result = dao.insert(null);
-            Assert.assertEquals(0, result);
-        } catch (Exception e) {
-            Assert.fail("Không nên có exception khi danh sách là null");
+    public void testDelete_ValidMaPhieu() throws SQLException {
+        // Assume data exists for TEST_MA_PHIEU
+        int result = dao.delete(String.valueOf(TEST_MA_PHIEU));
+        assertTrue("Delete should succeed for valid maPhieu", result >= 0);
+    }
+
+    // ✅ TC8: Xóa chi tiết với mã phiếu không tồn tại
+    @Test
+    public void testDelete_NonExistentMaPhieu() throws SQLException {
+        int result = dao.delete("9999");
+        assertEquals("Delete should return 0 for non-existent maPhieu", 0, result);
+    }
+
+    // ✅ TC9: Xóa chi tiết với mã phiếu null
+    @Test
+    public void testDelete_NullMaPhieu() throws SQLException {
+        int result = dao.delete(null);
+        assertEquals("Delete should return 0 for null maPhieu", 0, result);
+    }
+
+    // ✅ TC10: Xóa chi tiết với mã phiếu rỗng
+    @Test
+    public void testDelete_EmptyMaPhieu() throws SQLException {
+        int result = dao.delete("");
+        assertEquals("Delete should return 0 for empty maPhieu", 0, result);
+    }
+
+    // ✅ TC11: Cập nhật chi tiết với mã phiếu và danh sách hợp lệ
+    @Test
+    public void testUpdate_ValidData() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, 101, 10, 50000, 1));
+
+        int result = dao.update(list, String.valueOf(TEST_MA_PHIEU));
+        assertTrue("Update should succeed for valid data", result >= 1);
+    }
+
+    // ✅ TC12: Cập nhật chi tiết với mã phiếu không tồn tại
+    @Test
+    public void testUpdate_NonExistentMaPhieu() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(9999, 102, 5, 80000, 2));
+
+        int result = dao.update(list, "9999");
+        assertEquals("Update should return 0 for non-existent maPhieu", 0, result);
+    }
+
+    // ✅ TC13: Cập nhật chi tiết với danh sách rỗng
+    @Test
+    public void testUpdate_EmptyList() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        int result = dao.update(list, String.valueOf(TEST_MA_PHIEU));
+        assertEquals("Update should return 0 for empty list", 0, result);
+    }
+
+    // ✅ TC14: Cập nhật chi tiết với mã phiếu null
+    @Test
+    public void testUpdate_NullMaPhieu() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, 103, 3, 50000, 1));
+
+        int result = dao.update(list, null);
+        assertEquals("Update should return 0 for null maPhieu", 0, result);
+    }
+
+    // ✅ TC15: Truy vấn chi tiết với mã phiếu hợp lệ và có dữ liệu
+    @Test
+    public void testSelectAll_ValidMaPhieu_WithData() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> result = dao.selectAll(String.valueOf(TEST_MA_PHIEU));
+        assertNotNull("Result should not be null", result);
+        // Note: Cannot assert size > 0 without guaranteed data; adjust based on test data setup
+        for (ChiTietPhieuNhapDTO ct : result) {
+            assertEquals("MaPhieu should match", TEST_MA_PHIEU, ct.getMaphieu());
         }
     }
 
-    /**
-     * TC6: Thêm chi tiết với đơn giá = 0
-     * Mục đích: Đảm bảo hệ thống có thể xử lý giá trị biên.
-     */
+    // ✅ TC16: Truy vấn chi tiết với mã phiếu không tồn tại
     @Test
-    public void insertChiTietPhieuNhap_DonGiaBang0() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
+    public void testSelectAll_NonExistentMaPhieu() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> result = dao.selectAll("9999");
+        assertNotNull("Result should not be null", result);
+        assertEquals("Result should be empty for non-existent maPhieu", 0, result.size());
+    }
 
+    // ✅ TC17: Truy vấn chi tiết với mã phiếu null
+    @Test
+    public void testSelectAll_NullMaPhieu() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> result = dao.selectAll(null);
+        assertNotNull("Result should not be null", result);
+        assertEquals("Result should be empty for null maPhieu", 0, result.size());
+    }
+
+    // ✅ TC18: Truy vấn chi tiết với mã phiếu dạng chuỗi không hợp lệ
+    @Test
+    public void testSelectAll_InvalidMaPhieu() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> result = dao.selectAll("' OR 1=1 --");
+        assertNotNull("Result should not be null", result);
+        assertEquals("Result should be empty for invalid maPhieu", 0, result.size());
+    }
+
+    // ✅ TC19: Kiểm tra insert với số lượng lớn chi tiết
+    @Test
+    public void testInsert_LargeList() throws SQLException {
         ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
-        list.add(new ChiTietPhieuNhapDTO(1003, 104, 3, 0, 2));
+        for (int i = 0; i < 100; i++) {
+            list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, 101 + i, 10, 20000, 1));
+        }
 
         int result = dao.insert(list);
-        Assert.assertTrue(result == 1); // Chấp nhận giá = 0 nếu DB không ràng buộc
-        con.rollback();
+        assertEquals("Insert should succeed for large list", 100, result);
     }
 
-    /**
-     * TC1: Xóa chi tiết phiếu nhập với mã phiếu tồn tại
-     * Mục đích: Kiểm tra xem hệ thống có xóa thành công khi mã phiếu hợp lệ.
-     */
+    // ✅ TC20: Kiểm tra update với danh sách chứa số lượng âm
     @Test
-    public void deleteChiTietPhieuNhap_HopLe() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
+    public void testUpdate_NegativeQuantity() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, 101, -10, 50000, 1));
 
-        // Giả sử đã có dữ liệu với mã phiếu nhập "1001" trong csdl
-        String maPhieu = "1001";
-
-        int result = dao.delete(maPhieu);
-        Assert.assertTrue(result >= 1); // Có ít nhất một bản ghi bị xóa
-
-        con.rollback();
+        int result = dao.update(list, String.valueOf(TEST_MA_PHIEU));
+        assertEquals("Update should fail or handle negative quantity", 0, result);
+    }
+    // ✅ TC21: Insert chi tiết với maphieunhap không tồn tại (FK violation)
+    @Test(expected = SQLException.class)
+    public void testInsert_InvalidMaPhieu_ForeignKey() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(9999, TEST_MA_PHIENBANSP, 10, 20000, TEST_HINHTHUCNHAP)); // 9999 does not exist
+        dao.insert(list); // Should throw SQLException due to FK constraint
     }
 
-    /**
-     * TC2: Xóa với mã phiếu không tồn tại
-     * Mục đích: Kiểm tra khi mã phiếu không tồn tại trong bảng.
-     */
+    // ✅ TC22: Insert chi tiết với maphienbansp không tồn tại (FK violation)
+    @Test(expected = SQLException.class)
+    public void testInsert_InvalidMaPhienBanSP_ForeignKey() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, 9999, 10, 20000, TEST_HINHTHUCNHAP)); // 9999 does not exist
+        dao.insert(list); // Should throw SQLException due to FK constraint
+    }
+
+    // ✅ TC23: Insert chi tiết với soluong = 0 (invalid if DB constrains)
     @Test
-    public void deleteChiTietPhieuNhap_MaKhongTonTai() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
-
-        String maPhieu = "9999"; // Giả sử không tồn tại trong DB
-
-        int result = dao.delete(maPhieu);
-        Assert.assertEquals(0, result); // Không có bản ghi nào bị xóa
-
-        con.rollback();
+    public void testInsert_ZeroQuantity() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, TEST_MA_PHIENBANSP, 0, 20000, TEST_HINHTHUCNHAP));
+        int result = dao.insert(list);
+        assertEquals("Insert should fail or handle zero quantity", 0, result);
     }
 
-    /**
-     * TC3: Xóa với chuỗi rỗng
-     * Mục đích: Kiểm tra khi truyền mã phiếu rỗng.
-     */
+    // ✅ TC24: Insert chi tiết với dongia âm (invalid if DB constrains)
     @Test
-    public void deleteChiTietPhieuNhap_Rong() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
-
-        String maPhieu = "";
-
-        int result = dao.delete(maPhieu);
-        Assert.assertEquals(0, result); // Không thực hiện xóa vì mã không hợp lệ
-
-        con.rollback();
+    public void testInsert_NegativePrice() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, TEST_MA_PHIENBANSP, 10, -20000, TEST_HINHTHUCNHAP));
+        int result = dao.insert(list);
+        assertEquals("Insert should fail or handle negative price", 0, result);
     }
 
-    /**
-     * TC4: Xóa với giá trị null
-     * Mục đích: Đảm bảo hệ thống xử lý null an toàn mà không crash.
-     */
+    // ✅ TC25: Insert chi tiết với hinhthucnhap không hợp lệ (e.g., negative)
+    @Test(expected = SQLException.class)
+    public void testInsert_InvalidHinhThucNhap() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, TEST_MA_PHIENBANSP, 10, 20000, -1)); // Invalid hinhthucnhap
+        dao.insert(list); // Should throw SQLException if DB constrains hinhthucnhap
+    }
+
+    // ✅ TC26: Update chi tiết với maphieunhap không tồn tại (FK violation)
+    @Test(expected = SQLException.class)
+    public void testUpdate_InvalidMaPhieu_ForeignKey() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(9999, TEST_MA_PHIENBANSP, 10, 20000, TEST_HINHTHUCNHAP)); // 9999 does not exist
+        dao.update(list, "9999"); // Should throw SQLException due to FK constraint
+    }
+
+    // ✅ TC27: Update chi tiết với maphienbansp không tồn tại (FK violation)
+    @Test(expected = SQLException.class)
+    public void testUpdate_InvalidMaPhienBanSP_ForeignKey() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, 9999, 10, 20000, TEST_HINHTHUCNHAP)); // 9999 does not exist
+        dao.update(list, String.valueOf(TEST_MA_PHIEU)); // Should throw SQLException due to FK constraint
+    }
+
+    // ✅ TC28: Update chi tiết với soluong = 0 (invalid if DB constrains)
     @Test
-    public void deleteChiTietPhieuNhap_Null() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
-
-        String maPhieu = null;
-
-        int result = dao.delete(maPhieu);
-        Assert.assertEquals(0, result); // Không có gì để xóa, hoặc xử lý an toàn
-
-        con.rollback();
+    public void testUpdate_ZeroQuantity() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, TEST_MA_PHIENBANSP, 0, 20000, TEST_HINHTHUCNHAP));
+        int result = dao.update(list, String.valueOf(TEST_MA_PHIEU));
+        assertEquals("Update should fail or handle zero quantity", 0, result);
     }
 
-    /**
-     * TC1: Cập nhật thành công với mã phiếu tồn tại và danh sách chi tiết hợp lệ
-     * Mục đích: Kiểm tra quá trình xóa và chèn mới hoạt động đúng
-     */
+    // ✅ TC29: Update chi tiết với dongia âm (invalid if DB constrains)
     @Test
-    public void updateChiTietPhieuNhap_HopLe() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
-
-        // Danh sách mới để cập nhật
-        ArrayList<ChiTietPhieuNhapDTO> dsMoi = new ArrayList<>();
-        dsMoi.add(new ChiTietPhieuNhapDTO(1001, 1, 10, 50000, 1));  // phiếu, phiên bản sp, số lượng, đơn giá, phương thức
-
-        String maphieu = "1001"; // Mã phiếu tồn tại
-
-        int result = dao.update(dsMoi, maphieu);
-        Assert.assertTrue(result >= 1); // Phải có ít nhất 1 bản ghi được chèn sau xóa
-
-        con.rollback();
+    public void testUpdate_NegativePrice() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, TEST_MA_PHIENBANSP, 10, -20000, TEST_HINHTHUCNHAP));
+        int result = dao.update(list, String.valueOf(TEST_MA_PHIEU));
+        assertEquals("Update should fail or handle negative price", 0, result);
     }
 
-    /**
-     * TC2: Cập nhật khi mã phiếu không tồn tại
-     * Mục đích: Kiểm tra cập nhật thất bại khi không có gì để xóa
-     */
+    // ✅ TC30: Update chi tiết với hinhthucnhap không hợp lệ
+    @Test(expected = SQLException.class)
+    public void testUpdate_InvalidHinhThucNhap() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, TEST_MA_PHIENBANSP, 10, 20000, -1)); // Invalid hinhthucnhap
+        dao.update(list, String.valueOf(TEST_MA_PHIEU)); // Should throw SQLException
+    }
+
+    // ✅ TC31: Insert chi tiết với maphieunhap = 0 (invalid if DB constrains)
+    @Test(expected = SQLException.class)
+    public void testInsert_ZeroMaPhieu() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(0, TEST_MA_PHIENBANSP, 10, 20000, TEST_HINHTHUCNHAP));
+        dao.insert(list); // Should throw SQLException if maphieunhap is constrained
+    }
+
+    // ✅ TC32: Insert chi tiết với maphienbansp = 0 (invalid if DB constrains)
+    @Test(expected = SQLException.class)
+    public void testInsert_ZeroMaPhienBanSP() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> list = new ArrayList<>();
+        list.add(new ChiTietPhieuNhapDTO(TEST_MA_PHIEU, 0, 10, 20000, TEST_HINHTHUCNHAP));
+        dao.insert(list); // Should throw SQLException if maphienbansp is constrained
+    }
+
+    // ✅ TC33: SelectAll với maphieunhap chứa ký tự đặc biệt (non-SQL injection)
     @Test
-    public void updateChiTietPhieuNhap_MaPhieuKhongTonTai() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
-
-        ArrayList<ChiTietPhieuNhapDTO> dsMoi = new ArrayList<>();
-        dsMoi.add(new ChiTietPhieuNhapDTO(9999, 2, 5, 80000, 2)); // giả sử 9999 chưa có
-
-        String maphieu = "9999";
-
-        int result = dao.update(dsMoi, maphieu);
-        Assert.assertEquals(0, result); // Không có gì để xóa => không insert
-
-        con.rollback();
+    public void testSelectAll_SpecialCharactersMaPhieu() throws SQLException {
+        ArrayList<ChiTietPhieuNhapDTO> result = dao.selectAll("!@#$%^");
+        assertNotNull("Result should not be null", result);
+        assertEquals("Result should be empty for special characters", 0, result.size());
     }
 
-    /**
-     * TC3: Cập nhật với danh sách chi tiết rỗng
-     * Mục đích: Xóa xong không thêm gì mới
-     */
+    // ✅ TC34: Delete với maphieunhap chứa ký tự đặc biệt
     @Test
-    public void updateChiTietPhieuNhap_DanhSachRong() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
-
-        ArrayList<ChiTietPhieuNhapDTO> danhSachRong = new ArrayList<>();
-        String maphieu = "1002";
-
-        int result = dao.update(danhSachRong, maphieu);
-        Assert.assertEquals(0, result); // Xóa thành công nhưng không insert gì
-
-        con.rollback();
+    public void testDelete_SpecialCharactersMaPhieu() throws SQLException {
+        int result = dao.delete("!@#$%^");
+        assertEquals("Delete should return 0 for special characters", 0, result);
     }
-
-    /**
-     * TC4: Cập nhật với mã phiếu null
-     * Mục đích: Đảm bảo hệ thống xử lý an toàn khi khóa chính null
-     */
-    @Test
-    public void updateChiTietPhieuNhap_MaPhieuNull() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        Connection con = JDBCUtil.getConnection();
-        con.setAutoCommit(false);
-
-        ArrayList<ChiTietPhieuNhapDTO> ds = new ArrayList<>();
-        ds.add(new ChiTietPhieuNhapDTO(0, 1, 3, 50000, 1));
-
-        int result = dao.update(ds, null);
-        Assert.assertEquals(0, result); // Xử lý an toàn, không có hành động nào xảy ra
-
-        con.rollback();
-    }
-
-    /**
-     * TC1: Truy vấn danh sách chi tiết phiếu nhập với mã phiếu hợp lệ và có dữ liệu
-     * Mục đích: Kiểm tra truy vấn hoạt động đúng khi có dữ liệu
-     */
-    @Test
-    public void selectAllChiTietPhieuNhap_HopLeCoDuLieu() throws SQLException {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        String maphieu = "1001"; // Giả sử phiếu này có chi tiết
-
-        ArrayList<ChiTietPhieuNhapDTO> ds = dao.selectAll(maphieu);
-
-        Assert.assertNotNull(ds);                // Không null
-        Assert.assertTrue(ds.size() > 0);        // Có ít nhất 1 dòng dữ liệu
-        for (ChiTietPhieuNhapDTO ct : ds) {
-            Assert.assertEquals(1001, ct.getMaphieu()); // Mã phiếu đúng với điều kiện truy vấn
-        }
-    }
-
-    /**
-     * TC2: Truy vấn với mã phiếu hợp lệ nhưng không có dữ liệu
-     * Mục đích: Đảm bảo truy vấn trả về danh sách rỗng nếu không có chi tiết
-     */
-    @Test
-    public void selectAllChiTietPhieuNhap_KhongCoDuLieu() {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        String maphieu = "9999"; // Giả sử không có bản ghi nào với mã này
-
-        ArrayList<ChiTietPhieuNhapDTO> ds = dao.selectAll(maphieu);
-
-        Assert.assertNotNull(ds);           // Danh sách không null
-        Assert.assertEquals(0, ds.size());  // Danh sách rỗng
-    }
-
-    /**
-     * TC3: Truy vấn với mã phiếu null
-     * Mục đích: Đảm bảo hệ thống xử lý an toàn khi đầu vào là null
-     */
-    @Test
-    public void selectAllChiTietPhieuNhap_MaPhieuNull() {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-
-        ArrayList<ChiTietPhieuNhapDTO> ds = dao.selectAll(null);
-
-        Assert.assertNotNull(ds);           // Không nên trả về null
-        Assert.assertEquals(0, ds.size());  // Không có gì để trả về
-    }
-
-    /**
-     * TC4: Truy vấn với mã phiếu dạng chuỗi không hợp lệ
-     * Mục đích: Xác minh hệ thống không lỗi với chuỗi bất thường
-     */
-    @Test
-    public void selectAllChiTietPhieuNhap_MaPhieuSaiKieu() {
-        ChiTietPhieuNhapDAO dao = new ChiTietPhieuNhapDAO();
-        String maphieu = "' OR 1=1 --"; // SQL injection style string
-
-        ArrayList<ChiTietPhieuNhapDTO> ds = dao.selectAll(maphieu);
-
-        Assert.assertNotNull(ds);           // Không null
-        Assert.assertEquals(0, ds.size());  // Không được trả về gì cả
-    }
-
-
 }

@@ -43,13 +43,13 @@ public final class NhaCungCap extends JPanel implements ActionListener, ItemList
 
     PanelBorderRadius main, functionBar;
     JPanel pnlBorder1, pnlBorder2, pnlBorder3, pnlBorder4, contentCenter;
-    JTable tableNhaCungCap;
+    public JTable tableNhaCungCap;
     JScrollPane scrollTableSanPham;
     MainFunction mainFunction;
     IntegratedSearch search;
     JFrame owner = (JFrame) SwingUtilities.getWindowAncestor(this);
     Color BackgroundColor = new Color(240, 247, 250);
-    DefaultTableModel tblModel;
+    public DefaultTableModel tblModel;
     Main m;
     public NhaCungCapBUS nccBUS = new NhaCungCapBUS();
     public ArrayList<NhaCungCapDTO> listncc = nccBUS.getAll();
@@ -138,6 +138,20 @@ public final class NhaCungCap extends JPanel implements ActionListener, ItemList
 //        main.setBorder(new EmptyBorder(20, 20, 20, 20));
         contentCenter.add(main, BorderLayout.CENTER);
         main.add(scrollTableSanPham);
+
+
+        tableNhaCungCap.setName("tableNhaCungCap");
+        mainFunction.btn.get("create").setName("btnCreate");
+        mainFunction.btn.get("update").setName("btnUpdate");
+        mainFunction.btn.get("delete").setName("btnDelete");
+        mainFunction.btn.get("detail").setName("btnDetail");
+        mainFunction.btn.get("import").setName("btnImport");
+        mainFunction.btn.get("export").setName("btnExport");
+
+        search.txtSearchForm.setName("txtSearch");
+        search.cbxChoose.setName("cbxSearchType");
+        search.btnReset.setName("btnReset");
+
     }
 
     public NhaCungCap(Main m) {
