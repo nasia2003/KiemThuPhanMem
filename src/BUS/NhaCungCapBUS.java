@@ -6,6 +6,8 @@ package BUS;
 
 import DAO.NhaCungCapDAO;
 import DTO.NhaCungCapDTO;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -45,7 +47,7 @@ public class NhaCungCapBUS {
         return check;
     }
 
-    public boolean update(NhaCungCapDTO ncc) {
+    public boolean update(NhaCungCapDTO ncc) throws SQLException {
         boolean check = NccDAO.update(ncc) != 0;
         if (check) {
             this.listNcc.set(getIndexByMaNCC(ncc.getMancc()), ncc);

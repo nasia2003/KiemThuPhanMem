@@ -19,6 +19,7 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -152,7 +153,11 @@ public class NhaCungCapDialog extends JDialog implements ActionListener {
         } else if (e.getSource() == btnHuyBo) {
             dispose();
         } else if (e.getSource() == btnCapNhat && Validation()) {
-            jpNcc.nccBUS.update(new NhaCungCapDTO(nccDTO.getMancc(), tenNcc.getText(), diachi.getText(), email.getText(), sodienthoai.getText()));
+            try {
+                jpNcc.nccBUS.update(new NhaCungCapDTO(nccDTO.getMancc(), tenNcc.getText(), diachi.getText(), email.getText(), sodienthoai.getText()));
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             jpNcc.loadDataTable(jpNcc.listncc);
             dispose();
         }

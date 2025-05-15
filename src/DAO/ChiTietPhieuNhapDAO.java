@@ -20,6 +20,9 @@ public class ChiTietPhieuNhapDAO implements ChiTietInterface<ChiTietPhieuNhapDTO
         return new ChiTietPhieuNhapDAO();
     }
     public Connection con = ConnectionCustom.getInstance().getConnect();
+    public void setConnection(Connection con) {
+        this.con = con;
+    }
     @Override
     public int insert(ArrayList<ChiTietPhieuNhapDTO> t) {
         int result = 0;
@@ -34,7 +37,8 @@ public class ChiTietPhieuNhapDAO implements ChiTietInterface<ChiTietPhieuNhapDTO
                 pst.setInt(4, t.get(i).getDongia());
                 pst.setInt(5, t.get(i).getPhuongthucnnhap());
                 result = pst.executeUpdate();
-                JDBCUtil.closeConnection(con);
+//                JDBCUtil.closeConnection(con);
+                pst.close();
             } catch (SQLException ex) {
                 Logger.getLogger(ChiTietPhieuNhapDAO.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -52,7 +56,8 @@ public class ChiTietPhieuNhapDAO implements ChiTietInterface<ChiTietPhieuNhapDTO
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setString(1, t);
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
+            pst.close();
         } catch (SQLException ex) {
             Logger.getLogger(ChiTietPhieuNhapDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -86,11 +91,13 @@ public class ChiTietPhieuNhapDAO implements ChiTietInterface<ChiTietPhieuNhapDTO
                 ChiTietPhieuNhapDTO ctphieu = new ChiTietPhieuNhapDTO(phuongthucnhap, maphieu, maphienbansp, soluong, dongia);
                 result.add(ctphieu);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
+            pst.close();
         } catch (SQLException e) {
             System.out.println(e);
         }
         return result;
     }
+
 
 }

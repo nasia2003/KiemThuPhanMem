@@ -20,16 +20,35 @@ import java.util.Date;
  */
 public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
 
+//    public PhieuNhapDAO(Connection testCon) {
+//        this.con = testCon;
+//
+//    }
+
+    public PhieuNhapDAO() {
+
+    }
+
     public static PhieuNhapDAO getInstance() {
         return new PhieuNhapDAO();
     }
+    // Kết nối đến cơ sở dữ liệu
+
     public Connection con = ConnectionCustom.getInstance().getConnect();
-    
+    public void setConnection(Connection con) {
+        this.con = con;
+    }
+//    public static PhieuNhapDAO getInstance(Connection con) {
+//        PhieuNhapDAO dao = new PhieuNhapDAO();
+//        dao.setConnection(con);
+//        return new PhieuNhapDAO();
+//    }
+
     @Override
     public int insert(PhieuNhapDTO t) {
         int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+            Connection con = this.con != null ? this.con : JDBCUtil.getConnection(); // <-- sửa chỗ này
             String sql = "INSERT INTO `phieunhap`(`maphieunhap`, `thoigian`, `manhacungcap`, `nguoitao`, `tongtien`) VALUES (?,?,?,?,?)";
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setInt(1, t.getMaphieu());
@@ -38,7 +57,8 @@ public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
             pst.setInt(4, t.getManguoitao());
             pst.setDouble(5, t.getTongTien());
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
+            pst.close();
         } catch (SQLException ex) {
             Logger.getLogger(PhieuNhapDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -58,7 +78,9 @@ public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
             pst.setInt(4, t.getTrangthai());
             pst.setInt(5, t.getMaphieu());
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
+            pst.close();
+
         } catch (SQLException ex) {
             Logger.getLogger(PhieuNhapDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -74,7 +96,8 @@ public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setString(1, t);
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
+            pst.close();
         } catch (SQLException ex) {
             Logger.getLogger(PhieuNhapDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -99,7 +122,8 @@ public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
                 PhieuNhapDTO phieunhap = new PhieuNhapDTO(mancc, maphieu, nguoitao, thoigiantao, tongtien, trangthai);
                 result.add(phieunhap);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
+            pst.close();
         } catch (SQLException e) {
         }
         return result;
@@ -123,7 +147,8 @@ public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
                 int trangthai = rs.getInt("trangthai");
                 result = new PhieuNhapDTO(mancc, maphieu, nguoitao, thoigiantao, tongtien, trangthai);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
+            pst.close();
         } catch (Exception e) {
         }
         return result;
@@ -149,12 +174,13 @@ public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
                 PhieuNhapDTO phieunhap = new PhieuNhapDTO(mancc, maphieu, nguoitao, thoigiantao, tongtien, trangthai);
                 result.add(phieunhap);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
+            pst.close();
         } catch (SQLException e) {
         }
         return result;
     }
-    
+
     public boolean checkCancelPn(int maphieu){
         ArrayList<ChiTietSanPhamDTO> result = new ArrayList<>();
         try {
@@ -172,7 +198,8 @@ public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
                 ChiTietSanPhamDTO ct = new ChiTietSanPhamDTO(imei, macauhinh, maphieunhap, maphieuxuat, tinhtrang);
                 result.add(ct);
             }
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
+            pst.close();
         } catch (SQLException e) {
             System.out.println(e);
         }
@@ -183,7 +210,7 @@ public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
         }
         return true;
     }
-    
+
     public int cancelPhieuNhap(int maphieu){
         int result = 0;
         ChiTietSanPhamDAO.getInstance().deletePn(maphieu);
@@ -198,7 +225,8 @@ public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
             PreparedStatement pst = con.prepareStatement(sql);
             pst.setInt(1, maphieu);
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
+            pst.close();
         } catch (SQLException ex) {
             Logger.getLogger(PhieuNhapDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -225,6 +253,11 @@ public class PhieuNhapDAO implements DAOinterface<PhieuNhapDTO> {
         }
         return result;
     }
+
+
+
+
+
 
 
 

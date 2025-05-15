@@ -1,20 +1,37 @@
 package DAO;
 
 import DTO.PhieuNhapDTO;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.Instant;
+import config.JDBCUtil;
+import org.junit.*;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.*;
 
 public class PhieuNhapDAOTest {
+    private Connection testCon;
+    private PhieuNhapDAO dao;
+    private static int maphieu = 1001;
+    @Before
+    public void setUp() throws SQLException {
+        testCon = JDBCUtil.getConnection();
+        testCon.setAutoCommit(false);
+        dao = PhieuNhapDAO.getInstance();
+        dao.setConnection(testCon);
+    }
 
-    /**
-     * TC1: Kiểm tra phương thức getInstance()
-     * Mục đích: Đảm bảo rằng phương thức `getInstance()` trả về một đối tượng hợp lệ (không phải null) và đúng kiểu.
-     */
+    @After
+    public void tearDown() throws SQLException {
+        try {
+            testCon.rollback();
+        } finally {
+            testCon.setAutoCommit(true);
+//            JDBCUtil.closeConnection(testCon);
+        }
+    }
     @Test
     public void testGetInstance() {
         // Gọi phương thức getInstance()
@@ -26,842 +43,695 @@ public class PhieuNhapDAOTest {
         // Kiểm tra nếu đối tượng trả về là một thể hiện của PhieuNhapDAO
         Assert.assertTrue("Object should be an instance of PhieuNhapDAO", dao instanceof PhieuNhapDAO);
     }
-    /**
-     * TC1: Chèn phiếu nhập hợp lệ
-     * Mục đích: Đảm bảo có thể chèn một phiếu nhập hợp lệ vào cơ sở dữ liệu
-     */
+    // ✅ Case: update với dữ liệu hợp lệ
     @Test
-    public void insertPhieuNhap_HopLe() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
+    public void updatePhieuNhap_ValidData() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(1001);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setTongTien(500000);
+        phieu.setTrangthai(1);
 
-        pn.setMaphieu(1001); // Mã phiếu hợp lệ
-        pn.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
-        pn.setManhacungcap(1); // Nhà cung cấp tồn tại
-        pn.setManguoitao(1); // Người tạo hợp lệ
-        pn.setTongTien(1000000); // Tổng tiền hợp lệ
-
-        dao.con.setAutoCommit(false);
-        int result = dao.insert(pn);
-        Assert.assertEquals(1, result); // Kết quả mong đợi là 1 (thêm thành công)
-        dao.con.rollback(); // Hoàn tác để không thay đổi DB thực
+        int result = dao.update(phieu);
+        assertEquals("Cập nhật thành công nên phải trả về 1", 1, result);
     }
 
-    /**
-     * TC2: Chèn phiếu nhập với tổng tiền = 0
-     * Mục đích: Kiểm tra trường hợp tổng tiền bằng 0 khi thêm phiếu nhập
-     */
+    // ❌ Case: maphieunhap không tồn tại
     @Test
-    public void insertPhieuNhap_TongTienBang0() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
+    public void updatePhieuNhap_NonExistentId() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(9999); // giả sử không tồn tại
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setTongTien(1000000);
+        phieu.setTrangthai(1);
 
-        pn.setMaphieu(1002); // Mã phiếu hợp lệ
-        pn.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
-        pn.setManhacungcap(1); // Nhà cung cấp hợp lệ
-        pn.setManguoitao(1); // Người tạo hợp lệ
-        pn.setTongTien(0); // Tổng tiền = 0
-
-        dao.con.setAutoCommit(false);
-        int result = dao.insert(pn);
-        Assert.assertEquals(1, result); // Kết quả mong đợi là 1 (thêm thành công)
-        dao.con.rollback();
+        int result = dao.update(phieu);
+        assertEquals("Không có phiếu nhập với ID này nên update trả về 0", 0, result);
     }
 
-    /**
-     * TC3: Chèn phiếu nhập với mã phiếu đã tồn tại
-     * Mục đích: Kiểm tra việc chèn phiếu nhập với mã phiếu đã tồn tại trong DB
-     */
+    // ❌ Case: maphieunhap âm
     @Test
-    public void insertPhieuNhap_MaPhieuDaTonTai() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
+    public void updatePhieuNhap_NegativeId() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(-1);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setTongTien(100000);
+        phieu.setTrangthai(1);
 
-        pn.setMaphieu(1001); // Mã phiếu đã tồn tại
-        pn.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
-        pn.setManhacungcap(1); // Nhà cung cấp hợp lệ
-        pn.setManguoitao(1); // Người tạo hợp lệ
-        pn.setTongTien(500000); // Tổng tiền hợp lệ
-
-        dao.con.setAutoCommit(false);
-        int result = dao.insert(pn);
-        Assert.assertEquals(1, result); // Kết quả mong đợi là 1 nếu DB cho phép thêm
-        dao.con.rollback();
+        int result = dao.update(phieu);
+        assertEquals("maphieunhap âm → update trả về 0", 0, result);
     }
 
-    /**
-     * TC4: Chèn phiếu nhập với nhà cung cấp không tồn tại
-     * Mục đích: Kiểm tra trường hợp nhà cung cấp không tồn tại trong DB
-     */
+    // ❌ Case: thoigiantao null
     @Test
-    public void insertPhieuNhap_NhaCungCapKhongTonTai() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
+    public void updatePhieuNhap_NullTimestamp() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(1001);
+        phieu.setThoigiantao(null);
+        phieu.setManhacungcap(1001);
+        phieu.setTongTien(100000);
+        phieu.setTrangthai(1);
 
-        pn.setMaphieu(1003); // Mã phiếu hợp lệ
-        pn.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
-        pn.setManhacungcap(9999); // Nhà cung cấp không tồn tại
-        pn.setManguoitao(1); // Người tạo hợp lệ
-        pn.setTongTien(2000000); // Tổng tiền hợp lệ
-
-        dao.con.setAutoCommit(false);
-        int result = dao.insert(pn);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không thể thêm do NCC không tồn tại)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC5: Chèn phiếu nhập với người tạo không tồn tại
-     * Mục đích: Kiểm tra trường hợp người tạo không tồn tại trong DB
-     */
-    @Test
-    public void insertPhieuNhap_NguoiTaoKhongTonTai() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        pn.setMaphieu(1004); // Mã phiếu hợp lệ
-        pn.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
-        pn.setManhacungcap(1); // Nhà cung cấp hợp lệ
-        pn.setManguoitao(9999); // Người tạo không tồn tại
-        pn.setTongTien(1500000); // Tổng tiền hợp lệ
-
-        dao.con.setAutoCommit(false);
-        int result = dao.insert(pn);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không thể thêm do người tạo không tồn tại)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC6: Chèn phiếu nhập với thời gian là null
-     * Mục đích: Kiểm tra trường hợp thời gian tạo phiếu nhập là null
-     */
-    @Test
-    public void insertPhieuNhap_ThoiGianNull() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        pn.setMaphieu(1005); // Mã phiếu hợp lệ
-        pn.setThoigiantao(null); // Thời gian null
-        pn.setManhacungcap(1); // Nhà cung cấp hợp lệ
-        pn.setManguoitao(1); // Người tạo hợp lệ
-        pn.setTongTien(3000000); // Tổng tiền hợp lệ
-
-        dao.con.setAutoCommit(false);
-        int result = dao.insert(pn);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 nếu thời gian không hợp lệ
-        dao.con.rollback();
-    }
-
-    /**
-     * TC7: Chèn phiếu nhập với tổng tiền âm
-     * Mục đích: Kiểm tra việc chèn phiếu nhập có tổng tiền âm
-     */
-    @Test
-    public void insertPhieuNhap_TongTienAm() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        pn.setMaphieu(1006); // Mã phiếu hợp lệ
-        pn.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
-        pn.setManhacungcap(1); // Nhà cung cấp hợp lệ
-        pn.setManguoitao(1); // Người tạo hợp lệ
-        pn.setTongTien(-500000); // Tổng tiền âm (không hợp lệ)
-
-        dao.con.setAutoCommit(false);
-        int result = dao.insert(pn);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không thể thêm vì tổng tiền âm)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC1: Cập nhật phiếu nhập hợp lệ
-     * Mục đích: Đảm bảo rằng phiếu nhập hợp lệ có thể được cập nhật trong cơ sở dữ liệu
-     */
-    @Test
-    public void updatePhieuNhap_HopLe() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        pn.setMaphieu(1001); // Mã phiếu hợp lệ
-        pn.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
-        pn.setManhacungcap(1); // Nhà cung cấp hợp lệ
-        pn.setManguoitao(1); // Người tạo hợp lệ
-        pn.setTongTien(1500000); // Tổng tiền hợp lệ
-        pn.setTrangthai(1); // Trạng thái hợp lệ (1: Đang sử dụng)
-
-        dao.con.setAutoCommit(false);
-        int result = dao.update(pn);
-        Assert.assertEquals(1, result); // Kết quả mong đợi là 1 (cập nhật thành công)
-        dao.con.rollback(); // Hoàn tác để không thay đổi DB thực
-    }
-
-    /**
-     * TC2: Cập nhật phiếu nhập với tổng tiền bằng 0
-     * Mục đích: Kiểm tra khả năng cập nhật phiếu nhập với tổng tiền = 0
-     */
-    @Test
-    public void updatePhieuNhap_TongTienBang0() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        pn.setMaphieu(1002); // Mã phiếu hợp lệ
-        pn.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
-        pn.setManhacungcap(1); // Nhà cung cấp hợp lệ
-        pn.setManguoitao(1); // Người tạo hợp lệ
-        pn.setTongTien(0); // Tổng tiền bằng 0
-        pn.setTrangthai(1); // Trạng thái hợp lệ
-
-        dao.con.setAutoCommit(false);
-        int result = dao.update(pn);
-        Assert.assertEquals(1, result); // Kết quả mong đợi là 1 (cập nhật thành công)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC3: Cập nhật phiếu nhập với mã phiếu không tồn tại
-     * Mục đích: Kiểm tra khi mã phiếu không tồn tại trong cơ sở dữ liệu
-     */
-    @Test
-    public void updatePhieuNhap_MaPhieuKhongTonTai() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        pn.setMaphieu(9999); // Mã phiếu không tồn tại
-        pn.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
-        pn.setManhacungcap(1); // Nhà cung cấp hợp lệ
-        pn.setManguoitao(1); // Người tạo hợp lệ
-        pn.setTongTien(1000000); // Tổng tiền hợp lệ
-        pn.setTrangthai(1); // Trạng thái hợp lệ
-
-        dao.con.setAutoCommit(false);
-        int result = dao.update(pn);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không thể cập nhật vì mã phiếu không tồn tại)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC4: Cập nhật phiếu nhập với nhà cung cấp không tồn tại
-     * Mục đích: Kiểm tra khi nhà cung cấp không tồn tại trong cơ sở dữ liệu
-     */
-    @Test
-    public void updatePhieuNhap_NhaCungCapKhongTonTai() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        pn.setMaphieu(1003); // Mã phiếu hợp lệ
-        pn.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
-        pn.setManhacungcap(9999); // Nhà cung cấp không tồn tại
-        pn.setManguoitao(1); // Người tạo hợp lệ
-        pn.setTongTien(1500000); // Tổng tiền hợp lệ
-        pn.setTrangthai(1); // Trạng thái hợp lệ
-
-        dao.con.setAutoCommit(false);
-        int result = dao.update(pn);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không thể cập nhật vì nhà cung cấp không tồn tại)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC5: Cập nhật phiếu nhập với người tạo không tồn tại
-     * Mục đích: Kiểm tra khi người tạo không tồn tại trong cơ sở dữ liệu
-     */
-    @Test
-    public void updatePhieuNhap_NguoiTaoKhongTonTai() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        pn.setMaphieu(1004); // Mã phiếu hợp lệ
-        pn.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
-        pn.setManhacungcap(1); // Nhà cung cấp hợp lệ
-        pn.setManguoitao(9999); // Người tạo không tồn tại
-        pn.setTongTien(2000000); // Tổng tiền hợp lệ
-        pn.setTrangthai(1); // Trạng thái hợp lệ
-
-        dao.con.setAutoCommit(false);
-        int result = dao.update(pn);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không thể cập nhật vì người tạo không tồn tại)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC6: Cập nhật phiếu nhập với tổng tiền âm
-     * Mục đích: Kiểm tra khả năng cập nhật phiếu nhập với tổng tiền âm
-     */
-    @Test
-    public void updatePhieuNhap_TongTienAm() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        pn.setMaphieu(1005); // Mã phiếu hợp lệ
-        pn.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
-        pn.setManhacungcap(1); // Nhà cung cấp hợp lệ
-        pn.setManguoitao(1); // Người tạo hợp lệ
-        pn.setTongTien(-1000); // Tổng tiền âm (không hợp lệ)
-        pn.setTrangthai(1); // Trạng thái hợp lệ
-
-        dao.con.setAutoCommit(false);
-        int result = dao.update(pn);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không thể cập nhật vì tổng tiền âm)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC7: Cập nhật phiếu nhập với thời gian tạo null
-     * Mục đích: Kiểm tra khả năng cập nhật phiếu nhập với thời gian tạo là null
-     */
-    @Test
-    public void updatePhieuNhap_ThoiGianNull() throws SQLException {
-        PhieuNhapDTO pn = new PhieuNhapDTO();
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        pn.setMaphieu(1006); // Mã phiếu hợp lệ
-        pn.setThoigiantao(null); // Thời gian tạo phiếu nhập null
-        pn.setManhacungcap(1); // Nhà cung cấp hợp lệ
-        pn.setManguoitao(1); // Người tạo hợp lệ
-        pn.setTongTien(1000000); // Tổng tiền hợp lệ
-        pn.setTrangthai(1); // Trạng thái hợp lệ
-
-        dao.con.setAutoCommit(false);
-        int result = dao.update(pn);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không thể cập nhật vì thời gian tạo null)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC1: Xóa phiếu nhập hợp lệ
-     * Mục đích: Đảm bảo rằng phiếu nhập có mã hợp lệ sẽ được đánh dấu trạng thái là 0 (xóa thành công).
-     */
-    @Test
-    public void deletePhieuNhap_HopLe() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        String maphieu = "1001"; // Mã phiếu hợp lệ
-
-        dao.con.setAutoCommit(false);
-        int result = dao.delete(maphieu);
-        Assert.assertEquals(1, result); // Kết quả mong đợi là 1 (xóa thành công)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC2: Xóa phiếu nhập với mã phiếu không tồn tại
-     * Mục đích: Kiểm tra khi mã phiếu không tồn tại trong cơ sở dữ liệu
-     */
-    @Test
-    public void deletePhieuNhap_MaPhieuKhongTonTai() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        String maphieu = "9999"; // Mã phiếu không tồn tại trong cơ sở dữ liệu
-
-        dao.con.setAutoCommit(false);
-        int result = dao.delete(maphieu);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không có bản ghi nào bị xóa)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC3: Xóa phiếu nhập khi phiếu đã bị xóa (trangthai = 0)
-     * Mục đích: Kiểm tra trường hợp khi phiếu nhập đã bị xóa rồi.
-     */
-    @Test
-    public void deletePhieuNhap_PhiếuĐãXóa() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        String maphieu = "1002"; // Mã phiếu đã bị xóa (trangthai = 0)
-
-        dao.con.setAutoCommit(false);
-        int result = dao.delete(maphieu);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không có bản ghi nào bị xóa)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC4: Xóa phiếu nhập với mã phiếu là null
-     * Mục đích: Kiểm tra khi mã phiếu là null, đảm bảo không xảy ra lỗi.
-     */
-    @Test
-    public void deletePhieuNhap_MaPhieuNull() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        String maphieu = null; // Mã phiếu là null
-
-        dao.con.setAutoCommit(false);
-        int result = dao.delete(maphieu);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không có bản ghi nào bị xóa)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC5: Xóa phiếu nhập với chuỗi mã phiếu rỗng
-     * Mục đích: Kiểm tra khi mã phiếu là chuỗi rỗng, đảm bảo không có bản ghi nào bị xóa.
-     */
-    @Test
-    public void deletePhieuNhap_MaPhieuRong() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        String maphieu = ""; // Mã phiếu là chuỗi rỗng
-
-        dao.con.setAutoCommit(false);
-        int result = dao.delete(maphieu);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không có bản ghi nào bị xóa)
-        dao.con.rollback();
-    }
-
-    /**
-     * TC6: Xóa phiếu nhập với mã phiếu hợp lệ nhưng có lỗi kết nối cơ sở dữ liệu
-     * Mục đích: Kiểm tra khi có lỗi kết nối cơ sở dữ liệu, hàm trả về 0.
-     */
-    @Test
-    public void deletePhieuNhap_LoiKetNoi() throws SQLException {
-        // Giả lập lỗi kết nối cơ sở dữ liệu bằng cách thiết lập kết nối sai hoặc không tồn tại.
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        String maphieu = "1003"; // Mã phiếu hợp lệ nhưng sẽ gây lỗi kết nối
-
-        // Giả lập lỗi kết nối hoặc các tình huống ngoại lệ khác
-        dao.con = null; // Tắt kết nối để gây lỗi
-
-        dao.con.setAutoCommit(false);
-        int result = dao.delete(maphieu);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không có gì được xóa do lỗi kết nối)
-    }
-
-
-    /**
-     * TC1: Lấy tất cả phiếu nhập hợp lệ
-     * Mục đích: Đảm bảo rằng khi có các phiếu nhập trong cơ sở dữ liệu, phương thức trả về danh sách phiếu nhập đúng.
-     */
-    @Test
-    public void selectAll_PhiếuNhậpHợpLệ() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        // Giả sử cơ sở dữ liệu có một số phiếu nhập hợp lệ
-        ArrayList<PhieuNhapDTO> result = dao.selectAll();
-
-        // Kiểm tra rằng kết quả không rỗng
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.size() > 0); // Kết quả mong đợi có ít nhất 1 phiếu nhập trong danh sách
-    }
-
-    /**
-     * TC2: Lấy tất cả phiếu nhập khi không có phiếu nhập nào
-     * Mục đích: Kiểm tra trường hợp cơ sở dữ liệu không có phiếu nhập nào, phương thức phải trả về danh sách rỗng.
-     */
-    @Test
-    public void selectAll_KhongCoPhiếuNhap() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        // Giả sử cơ sở dữ liệu không có phiếu nhập nào
-        // Cần chuẩn bị cơ sở dữ liệu sao cho không có phiếu nhập trước khi chạy test này.
-        ArrayList<PhieuNhapDTO> result = dao.selectAll();
-
-        // Kiểm tra rằng kết quả là danh sách rỗng
-        Assert.assertNotNull(result);
-        Assert.assertEquals(0, result.size()); // Kết quả mong đợi là danh sách rỗng
-    }
-
-    /**
-     * TC3: Lấy tất cả phiếu nhập có dữ liệu hợp lệ, kiểm tra giá trị trả về
-     * Mục đích: Đảm bảo rằng các phiếu nhập được trả về đúng với dữ liệu trong cơ sở dữ liệu.
-     */
-    @Test
-    public void selectAll_KiemTraGiaTri() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        // Giả sử cơ sở dữ liệu có ít nhất 1 phiếu nhập hợp lệ
-        ArrayList<PhieuNhapDTO> result = dao.selectAll();
-
-        // Lấy thông tin của phiếu nhập đầu tiên trong danh sách
-        PhieuNhapDTO firstPhieuNhap = result.get(0);
-
-        // Kiểm tra giá trị của phiếu nhập đầu tiên
-        Assert.assertNotNull(firstPhieuNhap);
-        Assert.assertTrue(firstPhieuNhap.getMaphieu() > 0); // Mã phiếu nhập phải là số dương
-        Assert.assertNotNull(firstPhieuNhap.getThoigiantao()); // Thời gian tạo phiếu nhập không được null
-        Assert.assertTrue(firstPhieuNhap.getTongTien() > 0); // Tổng tiền phải là số dương
-    }
-
-    /**
-     * TC4: Lấy tất cả phiếu nhập với dữ liệu có giá trị null (thử nghiệm dữ liệu bị lỗi)
-     * Mục đích: Kiểm tra trường hợp dữ liệu phiếu nhập có giá trị null, phải kiểm tra kỹ lưỡng.
-     */
-    @Test
-    public void selectAll_PhiếuNhapVớiDữLiệuNull() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        // Giả sử cơ sở dữ liệu có một phiếu nhập có một số giá trị null
-        ArrayList<PhieuNhapDTO> result = dao.selectAll();
-
-        // Kiểm tra rằng danh sách không bị lỗi khi có giá trị null trong cơ sở dữ liệu
-        Assert.assertNotNull(result);
-        Assert.assertTrue(result.size() > 0);
-
-        for (PhieuNhapDTO phieuNhap : result) {
-            Assert.assertNotNull(phieuNhap.getThoigiantao()); // Kiểm tra xem thời gian tạo không phải là null
-            Assert.assertTrue(phieuNhap.getTongTien() > 0); // Kiểm tra tổng tiền phải là số dương
+        try {
+            dao.update(phieu);
+            fail("Expected SQLException due to null timestamp");
+        } catch (NullPointerException e) {
+            assertTrue(true); // expected
         }
     }
 
-    /**
-     * TC5: Lấy tất cả phiếu nhập khi có lỗi kết nối cơ sở dữ liệu
-     * Mục đích: Kiểm tra khi có lỗi kết nối với cơ sở dữ liệu, phương thức trả về danh sách rỗng hoặc lỗi thích hợp.
-     */
+    // ❌ Case: manhacungcap âm
     @Test
-    public void selectAll_LoiKetNoi() throws SQLException {
-        // Giả lập lỗi kết nối cơ sở dữ liệu bằng cách thiết lập kết nối sai hoặc không tồn tại.
-        PhieuNhapDAO dao = new PhieuNhapDAO();
+    public void updatePhieuNhap_NegativeSupplierId() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(1001);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(-5);
+        phieu.setTongTien(100000);
+        phieu.setTrangthai(1);
 
-        // Giả lập lỗi kết nối hoặc các tình huống ngoại lệ khác
-        dao.con = null; // Tắt kết nối để gây lỗi
-
-        // Thực thi phương thức selectAll khi không có kết nối
-        ArrayList<PhieuNhapDTO> result = dao.selectAll();
-
-        // Kiểm tra kết quả, mong đợi trả về danh sách rỗng do lỗi kết nối
-        Assert.assertNotNull(result);
-        Assert.assertEquals(0, result.size()); // Kết quả mong đợi là danh sách rỗng
+        int result = dao.update(phieu);
+        assertEquals("manhacungcap âm nên không update được", 0, result);
     }
 
-    /**
-     * TC1: Lấy phiếu nhập hợp lệ theo ID
-     * Mục đích: Đảm bảo rằng khi có phiếu nhập với mã hợp lệ trong cơ sở dữ liệu, phương thức trả về đối tượng `PhieuNhapDTO` đúng.
-     */
+    // ❌ Case: tongtien âm
     @Test
-    public void selectById_PhiếuNhậpHợpLệ() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        String validId = "1"; // Giả sử phiếu nhập với ID 1 tồn tại trong cơ sở dữ liệu
+    public void updatePhieuNhap_NegativeTotalAmount() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(1001);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setTongTien(-100000);
+        phieu.setTrangthai(1);
 
-        PhieuNhapDTO result = dao.selectById(validId);
-
-        // Kiểm tra rằng kết quả không null
-        Assert.assertNotNull(result);
-
-        // Kiểm tra các giá trị trong đối tượng PhieuNhapDTO
-        Assert.assertEquals(validId, String.valueOf(result.getMaphieu()));
-        Assert.assertTrue(result.getTongTien() > 0);  // Kiểm tra tổng tiền phải lớn hơn 0
-        Assert.assertNotNull(result.getThoigiantao());  // Kiểm tra thời gian tạo không null
+        int result = dao.update(phieu);
+        assertEquals("tongtien âm nên update không thành công", 0, result);
     }
 
-    /**
-     * TC2: Lấy phiếu nhập theo ID không tồn tại
-     * Mục đích: Kiểm tra trường hợp khi không có phiếu nhập nào với mã hợp lệ trong cơ sở dữ liệu, phương thức trả về null.
-     */
+    // ❌ Case: trangthai không hợp lệ (>1)
     @Test
-    public void selectById_KhongTimThayPhiếuNhap() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        String invalidId = "9999"; // Giả sử phiếu nhập với ID 9999 không tồn tại trong cơ sở dữ liệu
+    public void updatePhieuNhap_InvalidTrangThaiHigh() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(1001);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setTongTien(100000);
+        phieu.setTrangthai(5);
 
-        PhieuNhapDTO result = dao.selectById(invalidId);
-
-        // Kiểm tra kết quả trả về là null
-        Assert.assertNull(result);
+        int result = dao.update(phieu);
+        assertEquals("trangthai không hợp lệ nên update trả về 0", 0, result);
     }
 
-    /**
-     * TC3: Lấy phiếu nhập theo ID có dữ liệu null
-     * Mục đích: Kiểm tra trường hợp dữ liệu của phiếu nhập có thể chứa giá trị null, phương thức phải xử lý tốt các giá trị null.
-     */
+    // ❌ Case: trangthai không hợp lệ (<0)
     @Test
-    public void selectById_PhiếuNhapVớiDữLiệuNull() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        String validIdWithNullData = "2"; // Giả sử phiếu nhập với ID 2 có các giá trị null trong cơ sở dữ liệu
+    public void updatePhieuNhap_InvalidTrangThaiNegative() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(1001);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setTongTien(100000);
+        phieu.setTrangthai(-1);
 
-        PhieuNhapDTO result = dao.selectById(validIdWithNullData);
-
-        // Kiểm tra kết quả không null
-        Assert.assertNotNull(result);
-
-        // Kiểm tra xem giá trị của các trường có null không
-        Assert.assertNotNull(result.getThoigiantao()); // Thời gian tạo không được null
-        Assert.assertTrue(result.getTongTien() >= 0); // Tổng tiền có thể là 0 hoặc lớn hơn
+        int result = dao.update(phieu);
+        assertEquals("trangthai âm nên update không thành công", 0, result);
     }
 
-    /**
-     * TC4: Lấy phiếu nhập theo ID khi có lỗi kết nối
-     * Mục đích: Kiểm tra khi có lỗi kết nối cơ sở dữ liệu, phương thức trả về null hoặc xử lý lỗi đúng cách.
-     */
+    // ✅ Case: trangthai = 0 (valid)
     @Test
-    public void selectById_LoiKetNoi() throws SQLException {
-        // Giả lập lỗi kết nối cơ sở dữ liệu bằng cách thiết lập kết nối sai hoặc không tồn tại.
-        PhieuNhapDAO dao = new PhieuNhapDAO();
+    public void updatePhieuNhap_TrangThaiZero() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(1001);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setTongTien(150000);
+        phieu.setTrangthai(0);
 
-        // Giả lập lỗi kết nối hoặc các tình huống ngoại lệ khác
-        dao.con = null; // Tắt kết nối để gây lỗi
+        int result = dao.update(phieu);
+        assertEquals("trangthai = 0 vẫn hợp lệ", 1, result);
+    }
+    // ✅ Case: Chèn với dữ liệu hợp lệ
+    @Test
+    public void insertPhieuNhap_ValidData() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(maphieu++);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setManguoitao(1);
+        phieu.setTongTien(500000);
 
-        // Thực thi phương thức selectById khi không có kết nối
-        PhieuNhapDTO result = dao.selectById("1");
-
-        // Kiểm tra kết quả, mong đợi trả về null do lỗi kết nối
-        Assert.assertNull(result);
+        int result = dao.insert(phieu);
+        assertEquals("Chèn thành công nên phải trả về 1", 1, result);
     }
 
-    /**
-     * TC5: Kiểm tra phiếu nhập theo ID và kiểm tra đúng thông tin
-     * Mục đích: Đảm bảo khi lấy phiếu nhập theo ID, thông tin của nó phải chính xác.
-     */
-    @Test
-    public void selectById_KiemTraGiaTri() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        String validId = "1"; // Giả sử phiếu nhập với ID 1 tồn tại trong cơ sở dữ liệu
+    // ❌ Case: maphieunhap trùng
+    @Test(expected = SQLException.class)
+    public void insertPhieuNhap_DuplicateId() throws SQLException {
+        PhieuNhapDTO phieu1 = new PhieuNhapDTO();
+        phieu1.setMaphieu(maphieu);
+        phieu1.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu1.setManhacungcap(1001);
+        phieu1.setManguoitao(1);
+        phieu1.setTongTien(500000);
+        dao.insert(phieu1); // Chèn lần 1
 
-        PhieuNhapDTO result = dao.selectById(validId);
+        PhieuNhapDTO phieu2 = new PhieuNhapDTO();
+        phieu2.setMaphieu(maphieu++); // Trùng maphieu
+        phieu2.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu2.setManhacungcap(1001);
+        phieu2.setManguoitao(1);
+        phieu2.setTongTien(500000);
 
-        // Kiểm tra các giá trị trả về phải chính xác
-        Assert.assertNotNull(result);
-        Assert.assertEquals(validId, String.valueOf(result.getMaphieu())); // Kiểm tra mã phiếu nhập
-        Assert.assertTrue(result.getTongTien() > 0); // Kiểm tra tổng tiền
-        Assert.assertNotNull(result.getThoigiantao()); // Kiểm tra thời gian tạo phiếu nhập
+        dao.insert(phieu2); // Phải ném SQLException (vi phạm khóa chính)
     }
 
-    /**
-     * TC1: Kiểm tra thống kê với khoảng tiền hợp lệ
-     * Mục đích: Đảm bảo rằng khi gọi phương thức với khoảng tiền hợp lệ, phương thức trả về các phiếu nhập có tổng tiền nằm trong phạm vi từ `min` đến `max`.
-     */
+    // ❌ Case: maphieunhap âm
+    @Test(expected = SQLException.class)
+    public void insertPhieuNhap_NegativeId() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(-1);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setManguoitao(1);
+        phieu.setTongTien(100000);
+
+        dao.insert(phieu); // Phải ném SQLException (maphieu âm)
+    }
+
+    // ❌ Case: thoigiantao null
+    @Test(expected = SQLException.class)
+    public void insertPhieuNhap_NullTimestamp() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(maphieu++);
+        phieu.setThoigiantao(null);
+        phieu.setManhacungcap(1001);
+        phieu.setManguoitao(1);
+        phieu.setTongTien(100000);
+
+        dao.insert(phieu); // Phải ném SQLException (thoigian NOT NULL)
+    }
+
+    // ❌ Case: manhacungcap không tồn tại
+    @Test(expected = SQLException.class)
+    public void insertPhieuNhap_NonExistentSupplierId() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(maphieu++);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(9999); // Không tồn tại
+        phieu.setManguoitao(1);
+        phieu.setTongTien(100000);
+
+        dao.insert(phieu); // Phải ném SQLException (vi phạm khóa ngoại)
+    }
+
+    // ❌ Case: manhacungcap âm
+    @Test(expected = SQLException.class)
+    public void insertPhieuNhap_NegativeSupplierId() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(maphieu++);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(-5);
+        phieu.setManguoitao(1);
+        phieu.setTongTien(100000);
+
+        dao.insert(phieu); // Phải ném SQLException (manhacungcap âm)
+    }
+
+    // ❌ Case: nguoitao không tồn tại
+    @Test(expected = SQLException.class)
+    public void insertPhieuNhap_NonExistentCreatorId() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(maphieu++);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setManguoitao(999); // Không tồn tại
+        phieu.setTongTien(100000);
+
+        dao.insert(phieu); // Phải ném SQLException (vi phạm khóa ngoại)
+    }
+
+    // ❌ Case: nguoitao âm
+    @Test(expected = SQLException.class)
+    public void insertPhieuNhap_NegativeCreatorId() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(maphieu++);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setManguoitao(-1);
+        phieu.setTongTien(100000);
+
+        dao.insert(phieu); // Phải ném SQLException (nguoitao âm)
+    }
+
+    // ❌ Case: tongtien âm
+    @Test(expected = SQLException.class)
+    public void insertPhieuNhap_NegativeTotalAmount() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(maphieu++);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setManguoitao(1);
+        phieu.setTongTien(-100000);
+
+        dao.insert(phieu); // Phải ném SQLException (tongtien âm)
+    }
+
+    // ✅ Case: tongtien = 0 (hợp lệ nếu không có ràng buộc)
     @Test
-    public void statistical_KhoangTienHopLe() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        long min = 100000; // Giá trị min
-        long max = 1000000; // Giá trị max
+    public void insertPhieuNhap_ZeroTotalAmount() throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(maphieu++);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001);
+        phieu.setManguoitao(1);
+        phieu.setTongTien(0);
 
-        ArrayList<PhieuNhapDTO> result = dao.statistical(min, max);
+        int result = dao.insert(phieu);
+        assertEquals("tongtien = 0 vẫn hợp lệ nếu không có ràng buộc", 1, result);
+    }
 
-        // Kiểm tra kết quả trả về không phải null
-        Assert.assertNotNull(result);
+    // ❌ Case: DTO null
+    @Test(expected = SQLException.class)
+    public void insertPhieuNhap_NullDTO() throws SQLException {
+        dao.insert(null); // Phải ném SQLException
+    }
+    // Helper method to insert a test record
+    private void insertTestRecord() throws SQLException {
+        String sql = "INSERT INTO phieunhap (maphieunhap, thoigiantao, manhacungcap, tongtien, trangthai) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement pst = testCon.prepareStatement(sql);
+        pst.setString(1, String.valueOf(maphieu));
+        pst.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+        pst.setInt(3, 1001);
+        pst.setDouble(4, 500000);
+        pst.setInt(5, 1);
+        pst.executeUpdate();
+        pst.close();
+    }
 
-        // Kiểm tra rằng tất cả các phiếu nhập có tổng tiền nằm trong phạm vi min và max
-        for (PhieuNhapDTO phieuNhap : result) {
-            Assert.assertTrue(phieuNhap.getTongTien() >= min && phieuNhap.getTongTien() <= max);
+
+    // Test cases for delete
+    @Test
+    public void deletePhieuNhap_ValidId() throws SQLException {
+        int result = dao.delete(String.valueOf(maphieu));
+        assertEquals("Xóa thành công (trangthai = 0) nên trả về 1", 1, result);
+
+        // Verify the record was "deleted" (trangthai = 0)
+        String sql = "SELECT trangthai FROM phieunhap WHERE maphieunhap = ?";
+        PreparedStatement pst = testCon.prepareStatement(sql);
+        pst.setString(1, String.valueOf(maphieu));
+        ResultSet rs = pst.executeQuery();
+        if (rs.next()) {
+            assertEquals("trangthai phải là 0 sau khi xóa", 0, rs.getInt("trangthai"));
+        }
+        rs.close();
+        pst.close();
+    }
+
+    @Test
+    public void deletePhieuNhap_NonExistentId() throws SQLException {
+        int result = dao.delete("9999");
+        assertEquals("maphieunhap không tồn tại nên trả về 0", 0, result);
+    }
+
+    @Test
+    public void deletePhieuNhap_NullId() throws SQLException {
+        int result = dao.delete(null);
+        assertEquals("maphieunhap null nên trả về 0 hoặc ném lỗi", 0, result);
+    }
+
+    @Test
+    public void deletePhieuNhap_EmptyId() throws SQLException {
+        int result = dao.delete("");
+        assertEquals("maphieunhap rỗng nên trả về 0", 0, result);
+    }
+
+    @Test
+    public void deletePhieuNhap_InvalidFormat() throws SQLException {
+        int result = dao.delete("abc");
+        assertEquals("maphieunhap không phải số nên trả về 0 hoặc ném lỗi", 0, result);
+    }
+    @Test
+    public void selectAll_ReturnsListWithInsertedData() throws SQLException {
+        // Tạo phiếu nhập test
+        PhieuNhapDTO dto = new PhieuNhapDTO();
+        dto.setMaphieu(3001);
+        dto.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        dto.setManhacungcap(1);
+        dto.setManguoitao(1);
+        dto.setTongTien(99999);
+        dto.setTrangthai(1);
+        dao.insert(dto);
+
+        ArrayList<PhieuNhapDTO> list = dao.selectAll();
+
+        // Danh sách không được null và phải có ít nhất 1 phần tử vừa thêm
+        assertNotNull("Danh sách không được null", list);
+        assertTrue("Phải có ít nhất 1 phiếu nhập", list.size() > 0);
+
+        // Kiểm tra có chứa phần tử vừa thêm vào không
+        boolean containsInserted = list.stream().anyMatch(p ->
+                p.getMaphieu() == 3001 &&
+                        p.getManhacungcap() == 1 &&
+                        p.getManguoitao() == 1 &&
+                        p.getTongTien() == 99999 &&
+                        p.getTrangthai() == 1
+        );
+        assertTrue("Danh sách phải chứa phiếu nhập vừa thêm", containsInserted);
+    }
+
+    @Test
+    public void selectAll_ReturnsEmptyListWhenNoRecords() throws SQLException {
+        // Xoá sạch dữ liệu test nếu cần (phụ thuộc vào setup môi trường test)
+        Statement stmt = testCon.createStatement();
+        stmt.execute("DELETE FROM phieunhap");
+
+        ArrayList<PhieuNhapDTO> list = dao.selectAll();
+
+        assertNotNull("Danh sách không được null", list);
+        assertEquals("Không có bản ghi nên danh sách phải rỗng", 0, list.size());
+    }
+
+    @Test
+    public void selectAll_ListIsSortedDescendingByMaphieu() throws SQLException {
+        // Chèn 3 bản ghi có maphieu khác nhau
+        PhieuNhapDTO p1 = new PhieuNhapDTO(1, 1001, 1, new Timestamp(System.currentTimeMillis()), 50000, 1);
+        PhieuNhapDTO p2 = new PhieuNhapDTO(1, 1002, 1, new Timestamp(System.currentTimeMillis()), 60000, 1);
+        PhieuNhapDTO p3 = new PhieuNhapDTO(1, 1003, 1, new Timestamp(System.currentTimeMillis()), 70000, 1);
+        dao.insert(p1);
+        dao.insert(p2);
+        dao.insert(p3);
+
+        ArrayList<PhieuNhapDTO> list = dao.selectAll();
+
+        // Lọc 3 maphieu vừa test ra khỏi danh sách
+        List<Integer> maphieus = list.stream()
+                .map(PhieuNhapDTO::getMaphieu)
+                .filter(id -> id >= 1001 && id <= 1003)
+                .collect(Collectors.toList());
+
+        // Kiểm tra xem có sắp xếp giảm dần không
+        assertEquals(Arrays.asList(1003, 1002, 1001), maphieus);
+    }
+    @Test
+    public void selectById_ExistingId() throws SQLException {
+        PhieuNhapDTO dto = new PhieuNhapDTO(1, 5001, 1, new Timestamp(System.currentTimeMillis()), 123456L, 1);
+        dao.insert(dto);
+
+        PhieuNhapDTO result = dao.selectById("5001");
+
+        assertNotNull("Phải trả về DTO nếu ID tồn tại", result);
+        assertEquals(5001, result.getMaphieu());
+        assertEquals(1, result.getManhacungcap());
+        assertEquals(1, result.getManguoitao());
+        assertEquals(123456L, result.getTongTien());
+        assertEquals(1, result.getTrangthai());
+    }
+    @Test
+    public void selectById_NonExistentId() {
+        PhieuNhapDTO result = dao.selectById("999999");
+        assertNull("Phải trả về null nếu ID không tồn tại", result);
+    }
+    @Test
+    public void selectById_InvalidStringId() {
+        PhieuNhapDTO result = dao.selectById("abc"); // sẽ không có bản ghi nào với ID "abc"
+        assertNull("Phải trả về null nếu ID là chuỗi không hợp lệ", result);
+    }
+    @Test
+    public void selectById_EmptyString() {
+        PhieuNhapDTO result = dao.selectById("");
+        assertNull("ID rỗng → không tìm thấy → trả về null", result);
+    }
+    @Test
+    public void selectById_NullInput() {
+        PhieuNhapDTO result = dao.selectById(null);
+        assertNull("ID null → không tìm thấy → trả về null", result);
+    }
+    @Test
+    public void selectById_SpecialCharacters() {
+        PhieuNhapDTO result = dao.selectById("!@#$%^");
+        assertNull("Ký tự đặc biệt không match ID → trả về null", result);
+    }
+    @Test
+    public void selectById_NegativeId() {
+        PhieuNhapDTO result = dao.selectById("-1");
+        assertNull("ID âm không tồn tại → trả về null", result);
+    }
+    private void insertPhieuNhapTestData(int maphieu, long tongTien) throws SQLException {
+        PhieuNhapDTO dto = new PhieuNhapDTO();
+        dto.setMaphieu(maphieu);
+        dto.setManhacungcap(1);
+        dto.setManguoitao(1);
+        dto.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        dto.setTongTien(tongTien);
+        dto.setTrangthai(1);
+    }
+    // ✅ Dữ liệu hợp lệ, có kết quả
+    @Test
+    public void statistical_WithMatchingRecords() throws SQLException {
+        insertPhieuNhapTestData(1001, 500000);
+        insertPhieuNhapTestData(1002, 800000);
+
+        ArrayList<PhieuNhapDTO> results = dao.statistical(400000, 900000);
+        assertEquals("Phải có 2 bản ghi trong khoảng [400000, 900000]", 2, results.size());
+    }
+
+    // ❌ Không có bản ghi nào trong khoảng
+    @Test
+    public void statistical_NoRecordsInRange() throws SQLException {
+        insertPhieuNhapTestData(1003, 1000000);
+
+        ArrayList<PhieuNhapDTO> results = dao.statistical(1, 1000);
+        assertEquals("Không có bản ghi nào trong khoảng [1, 1000]", 0, results.size());
+    }
+
+    // ❌ min > max
+    @Test
+    public void statistical_MinGreaterThanMax() throws SQLException {
+        insertPhieuNhapTestData(1004, 300000);
+
+        ArrayList<PhieuNhapDTO> results = dao.statistical(1000000, 100000);
+        assertEquals("min > max → không có kết quả", 0, results.size());
+    }
+
+    // ✅ min = max và có đúng một bản ghi khớp
+    @Test
+    public void statistical_MinEqualsMax_OneMatch() throws SQLException {
+        insertPhieuNhapTestData(1005, 777777);
+
+        ArrayList<PhieuNhapDTO> results = dao.statistical(777777, 777777);
+        assertEquals("Phải tìm được đúng 1 bản ghi khi min = max và khớp", 1, results.size());
+    }
+
+    // ❌ min = max nhưng không có bản ghi
+    @Test
+    public void statistical_MinEqualsMax_NoMatch() throws SQLException {
+        ArrayList<PhieuNhapDTO> results = dao.statistical(555555, 555555);
+        assertEquals("Không có bản ghi nào có tổng tiền = 555555", 0, results.size());
+    }
+
+    // ✅ Trường hợp khoảng rộng [0, Long.MAX_VALUE]
+    @Test
+    public void statistical_ZeroToMax() throws SQLException {
+        insertPhieuNhapTestData(1006, 10000000);
+
+        ArrayList<PhieuNhapDTO> results = dao.statistical(0, Long.MAX_VALUE);
+        assertTrue("Khoảng lớn → phải có ít nhất 1 bản ghi", results.size() >= 1);
+    }
+
+    // ❌ min và max âm → không hợp lệ về ngữ nghĩa
+    @Test
+    public void statistical_NegativeMinMax() throws SQLException {
+        ArrayList<PhieuNhapDTO> results = dao.statistical(-100000, -1);
+        assertEquals("Tổng tiền không thể âm nên không có bản ghi", 0, results.size());
+    }
+
+    // ✅ Test toàn khoảng Long
+    @Test
+    public void statistical_MinToMaxRange() throws SQLException {
+        insertPhieuNhapTestData(1007, 999999999);
+
+        ArrayList<PhieuNhapDTO> results = dao.statistical(Long.MIN_VALUE, Long.MAX_VALUE);
+        assertTrue("Toàn bộ range của Long → phải chứa bản ghi", results.size() >= 1);
+    }
+    private void insertChiTietSanPham(String imei, int maphienban, int maphieunhap, int maphieuxuat, int tinhtrang) throws SQLException {
+        String sql = "INSERT INTO ctsanpham (maimei, maphienbansp, maphieunhap, maphieuxuat, tinhtrang) VALUES (?, ?, ?, ?, ?)";
+        PreparedStatement pst = testCon.prepareStatement(sql);
+        pst.setString(1, imei);
+        pst.setInt(2, maphienban);
+        pst.setInt(3, maphieunhap);
+        pst.setInt(4, maphieuxuat);
+        pst.setInt(5, tinhtrang);
+        pst.executeUpdate();
+        pst.close();
+    }
+
+    // ✅ Test Case 1: Không có sản phẩm nào thuộc phiếu nhập
+    @Test
+    public void checkCancelPn_NoProductFound() {
+        int maphieu = 9999; // Giả sử không tồn tại
+        boolean result = dao.checkCancelPn(maphieu);
+        assertTrue("Không có sản phẩm nào → có thể hủy", result);
+    }
+
+    // ✅ Test Case 2: Tất cả sản phẩm chưa xuất
+    @Test
+    public void checkCancelPn_AllUnexported() throws SQLException {
+        int maphieu = 1001;
+        insertChiTietSanPham("IMEI0001", 1, maphieu, 0, 1);
+        insertChiTietSanPham("IMEI0002", 1, maphieu, 0, 1);
+
+        boolean result = dao.checkCancelPn(maphieu);
+        assertTrue("Tất cả sản phẩm chưa xuất → có thể hủy", result);
+    }
+
+    // ❌ Test Case 3: Một sản phẩm đã xuất
+    @Test
+    public void checkCancelPn_OneExported() throws SQLException {
+        int maphieu = 1002;
+        insertChiTietSanPham("IMEI0003", 1, maphieu, 0, 1);
+        insertChiTietSanPham("IMEI0004", 1, maphieu, 1234, 1); // Đã xuất
+
+        boolean result = dao.checkCancelPn(maphieu);
+        assertFalse("Có 1 sản phẩm đã xuất → không thể hủy", result);
+    }
+
+    // ❌ Test Case 4: Tất cả sản phẩm đã xuất
+    @Test
+    public void checkCancelPn_AllExported() throws SQLException {
+        int maphieu = 1003;
+        insertChiTietSanPham("IMEI0005", 1, maphieu, 1111, 1);
+        insertChiTietSanPham("IMEI0006", 1, maphieu, 2222, 1);
+
+        boolean result = dao.checkCancelPn(maphieu);
+        assertFalse("Tất cả sản phẩm đã xuất → không thể hủy", result);
+    }
+
+    // Helper method to check soluongton in phienbansanpham
+    private int getSoLuongTon(int maphienban) throws SQLException {
+        String sql = "SELECT soluongton FROM phienbansanpham WHERE maphienban = ?";
+        try (PreparedStatement pst = testCon.prepareStatement(sql)) {
+            pst.setInt(1, maphienban);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                return rs.getInt("soluongton");
+            }
+            return 0;
         }
     }
 
-    /**
-     * TC2: Kiểm tra thống kê với khoảng tiền không có phiếu nhập
-     * Mục đích: Kiểm tra khi không có phiếu nhập nào trong phạm vi `min` và `max`, phương thức phải trả về danh sách rỗng.
-     */
-    @Test
-    public void statistical_KhoangTienKhongCoPhieuNhap() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        long min = 10000000; // Giá trị min cao
-        long max = 20000000; // Giá trị max cao
-
-        ArrayList<PhieuNhapDTO> result = dao.statistical(min, max);
-
-        // Kiểm tra rằng kết quả trả về là danh sách rỗng
-        Assert.assertTrue(result.isEmpty());
-    }
-
-    /**
-     * TC3: Kiểm tra thống kê với khoảng tiền là 0
-     * Mục đích: Kiểm tra khi gọi phương thức với khoảng tiền từ 0 đến một giá trị hợp lệ.
-     */
-    @Test
-    public void statistical_KhoangTienZero() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        long min = 0; // Giá trị min bằng 0
-        long max = 1000000; // Giá trị max hợp lệ
-
-        ArrayList<PhieuNhapDTO> result = dao.statistical(min, max);
-
-        // Kiểm tra kết quả trả về không phải null
-        Assert.assertNotNull(result);
-
-        // Kiểm tra tất cả các phiếu nhập có tổng tiền nằm trong phạm vi min và max
-        for (PhieuNhapDTO phieuNhap : result) {
-            Assert.assertTrue(phieuNhap.getTongTien() >= min && phieuNhap.getTongTien() <= max);
+    // Helper method to insert a phienbansanpham record
+    private void insertPhienBanSanPham(int maphienban, int soluongton) throws SQLException {
+        String sql = "INSERT INTO phienbansanpham (maphienban, masanpham, soluongton) VALUES (?, ?, ?)";
+        try (PreparedStatement pst = testCon.prepareStatement(sql)) {
+            pst.setInt(1, maphienban);
+            pst.setInt(2, 1); // Dummy masanpham
+            pst.setInt(3, soluongton);
+            pst.executeUpdate();
         }
     }
-
-    /**
-     * TC4: Kiểm tra thống kê với min > max
-     * Mục đích: Kiểm tra khi giá trị min lớn hơn max, phương thức có xử lý đúng không.
-     */
-    @Test
-    public void statistical_MinLonHonMax() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        long min = 5000000; // Giá trị min lớn hơn max
-        long max = 1000000; // Giá trị max nhỏ
-
-        ArrayList<PhieuNhapDTO> result = dao.statistical(min, max);
-
-        // Kiểm tra kết quả trả về là danh sách rỗng, vì min > max
-        Assert.assertTrue(result.isEmpty());
+    private void insertDummyPhieuNhap(int maphieu) throws SQLException {
+        String sql = "INSERT INTO phieunhap (maphieunhap, thoigian, manhacungcap, nguoitao, tongtien, trangthai) " +
+                "VALUES (?, CURRENT_TIMESTAMP, 1, 1, 1000000, 1)";
+        PreparedStatement pst = testCon.prepareStatement(sql);
+        pst.setInt(1, maphieu);
+        pst.executeUpdate();
+        pst.close();
     }
 
-    /**
-     * TC5: Kiểm tra thống kê với khoảng tiền rất nhỏ và rất lớn
-     * Mục đích: Kiểm tra việc thống kê với khoảng tiền rất nhỏ (0) và rất lớn (không giới hạn), phương thức có trả về đúng dữ liệu.
-     */
+    // ✅ TC4: Cancel with multiple chitietphieunhap and verify stock update
     @Test
-    public void statistical_KhoangTienRatNhoVaRatLon() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        long min = 0; // Khoảng tiền nhỏ nhất
-        long max = Long.MAX_VALUE; // Khoảng tiền lớn nhất
+    public void testCancelPhieuNhap_MultipleChiTiet_StockUpdate() throws SQLException {
+        int maphieu = 5003;
+        int maphienban1 = 1;
+        int maphienban2 = 2;
 
-        ArrayList<PhieuNhapDTO> result = dao.statistical(min, max);
+        // Insert phienbansanpham with initial stock
+        insertPhienBanSanPham(maphienban1, 100);
+        insertPhienBanSanPham(maphienban2, 200);
 
-        // Kiểm tra kết quả trả về không phải null
-        Assert.assertNotNull(result);
+        // Insert phieunhap
+        insertDummyPhieuNhap(maphieu);
 
-        // Kiểm tra rằng các phiếu nhập có tổng tiền hợp lệ và không bị giới hạn
-        for (PhieuNhapDTO phieuNhap : result) {
-            Assert.assertTrue(phieuNhap.getTongTien() >= min && phieuNhap.getTongTien() <= max);
+        // Insert two chitietphieunhap
+        String sql = "INSERT INTO chitietphieunhap (maphieunhap, maphienbansp, soluong, dongia) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement pst = testCon.prepareStatement(sql)) {
+            // First chitiet: 10 units
+            pst.setInt(1, maphieu);
+            pst.setInt(2, maphienban1);
+            pst.setInt(3, 10);
+            pst.setDouble(4, 500000);
+            pst.executeUpdate();
+
+            // Second chitiet: 20 units
+            pst.setInt(1, maphieu);
+            pst.setInt(2, maphienban2);
+            pst.setInt(3, 20);
+            pst.setDouble(4, 600000);
+            pst.executeUpdate();
         }
-    }
 
-    /**
-     * TC1: Kiểm tra khi phiếu nhập có thể hủy
-     * Mục đích: Đảm bảo rằng nếu tất cả các chi tiết sản phẩm có `maphieuxuat = 0`, phiếu nhập có thể bị hủy (kết quả trả về true).
-     */
-    @Test
-    public void checkCancelPn_TatCaChiTietChuaXuat() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        int maphieu = 1001; // Mã phiếu nhập mẫu
+        // Verify initial stock
+        assertEquals(100, getSoLuongTon(maphienban1));
+        assertEquals(200, getSoLuongTon(maphienban2));
 
-        // Giả lập dữ liệu cho ctsanpham để tất cả các sản phẩm đều chưa xuất
-        // Thêm chi tiết sản phẩm giả lập với maphieuxuat = 0
-        // Giả lập việc insert vào cơ sở dữ liệu giả lập, hoặc giả lập được kết quả khi gọi phương thức select.
-
-        boolean result = dao.checkCancelPn(maphieu);
-
-        // Kiểm tra nếu kết quả trả về là true (có thể hủy phiếu nhập)
-        Assert.assertTrue(result);
-    }
-
-    /**
-     * TC2: Kiểm tra khi phiếu nhập không thể hủy
-     * Mục đích: Đảm bảo rằng nếu có ít nhất một chi tiết sản phẩm có `maphieuxuat != 0`, phiếu nhập không thể hủy (kết quả trả về false).
-     */
-    @Test
-    public void checkCancelPn_CoChiTietDaXuat() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        int maphieu = 1002; // Mã phiếu nhập mẫu
-
-        // Giả lập dữ liệu cho ctsanpham để có ít nhất một sản phẩm có `maphieuxuat != 0`
-        // Giả lập việc insert vào cơ sở dữ liệu giả lập, hoặc giả lập được kết quả khi gọi phương thức select.
-
-        boolean result = dao.checkCancelPn(maphieu);
-
-        // Kiểm tra nếu kết quả trả về là false (không thể hủy phiếu nhập)
-        Assert.assertFalse(result);
-    }
-
-    /**
-     * TC3: Kiểm tra khi phiếu nhập không có chi tiết sản phẩm
-     * Mục đích: Đảm bảo rằng nếu phiếu nhập không có chi tiết sản phẩm nào, kết quả trả về vẫn đúng (phiếu nhập có thể hủy).
-     */
-    @Test
-    public void checkCancelPn_KhongCoChiTietSanPham() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        int maphieu = 1003; // Mã phiếu nhập mẫu
-
-        // Giả lập dữ liệu cho ctsanpham để không có chi tiết sản phẩm nào
-        // Giả lập việc insert vào cơ sở dữ liệu giả lập, hoặc giả lập được kết quả khi gọi phương thức select.
-
-        boolean result = dao.checkCancelPn(maphieu);
-
-        // Kiểm tra nếu kết quả trả về là true (có thể hủy phiếu nhập)
-        Assert.assertTrue(result);
-    }
-
-    /**
-     * TC4: Kiểm tra khi có lỗi xảy ra trong truy vấn cơ sở dữ liệu
-     * Mục đích: Kiểm tra khi có lỗi trong quá trình truy vấn cơ sở dữ liệu (ví dụ lỗi kết nối DB), phương thức phải xử lý lỗi một cách hợp lý.
-     */
-    @Test
-    public void checkCancelPn_LoiTruyVanDuLieu() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        int maphieu = 1004; // Mã phiếu nhập mẫu
-
-        // Giả lập lỗi trong quá trình truy vấn, ví dụ như kết nối DB bị lỗi.
-
-        boolean result = dao.checkCancelPn(maphieu);
-
-        // Kiểm tra nếu kết quả trả về là true hoặc false tùy theo cách xử lý lỗi trong phương thức
-        // Trong trường hợp này, giả lập là không thể xác định kết quả khi có lỗi.
-        // Ta có thể xử lý lỗi và kiểm tra giá trị mặc định trả về.
-        Assert.assertFalse(result); // hoặc Assert.assertTrue(result) tùy cách xử lý lỗi của bạn.
-    }
-
-    /**
-     * TC1: Kiểm tra hủy phiếu nhập hợp lệ
-     * Mục đích: Đảm bảo rằng khi hủy phiếu nhập hợp lệ, các thay đổi liên quan đến các chi tiết sản phẩm, phiếu nhập được thực hiện đúng.
-     */
-    @Test
-    public void cancelPhieuNhap_HopLe() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        int maphieu = 1001; // Mã phiếu nhập mẫu hợp lệ
-
-        // Giả lập hoặc chèn dữ liệu vào cơ sở dữ liệu để tạo một phiếu nhập hợp lệ với chi tiết sản phẩm
-
-        // Gọi phương thức cancelPhieuNhap
+        // Cancel phieunhap
         int result = dao.cancelPhieuNhap(maphieu);
+        assertEquals("Cancel thành công nên trả về 1", 1, result);
 
-        // Kiểm tra nếu kết quả trả về là 1 (hủy thành công)
-        Assert.assertEquals(1, result);
+        // Verify stock reduction
+        assertEquals("Soluongton should decrease by 10", 90, getSoLuongTon(maphienban1));
+        assertEquals("Soluongton should decrease by 20", 180, getSoLuongTon(maphienban2));
 
-        // Kiểm tra xem các bản ghi liên quan trong các bảng đã bị xóa hoặc cập nhật đúng (ChiTietPhieuNhap, ChiTietSanPham, PhienBanSanPham)
-        // Có thể viết các truy vấn kiểm tra lại trong cơ sở dữ liệu để đảm bảo rằng các bản ghi đã được xóa hoặc cập nhật đúng
+        // Verify phieunhap is deleted
+        String checkSql = "SELECT COUNT(*) FROM phieunhap WHERE maphieunhap = ?";
+        try (PreparedStatement pst = testCon.prepareStatement(checkSql)) {
+            pst.setInt(1, maphieu);
+            ResultSet rs = pst.executeQuery();
+            rs.next();
+            assertEquals("Phieunhap should be deleted", 0, rs.getInt(1));
+        }
     }
 
-    /**
-     * TC2: Kiểm tra khi phiếu nhập không tồn tại
-     * Mục đích: Đảm bảo rằng nếu phiếu nhập không tồn tại, không có thay đổi nào được thực hiện và kết quả trả về là 0.
-     */
+    // ❌ TC5: Negative maphieu
     @Test
-    public void cancelPhieuNhap_KhongTonTai() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        int maphieu = 9999; // Mã phiếu nhập không tồn tại trong cơ sở dữ liệu
-
-        // Gọi phương thức cancelPhieuNhap
-        int result = dao.cancelPhieuNhap(maphieu);
-
-        // Kiểm tra nếu kết quả trả về là 0 (không có gì thay đổi vì không tìm thấy phiếu nhập)
-        Assert.assertEquals(0, result);
+    public void testCancelPhieuNhap_NegativeId() throws SQLException {
+        int result = dao.cancelPhieuNhap(-1);
+        assertEquals("maphieu âm nên trả về 0", 0, result);
     }
 
-    /**
-     * TC3: Kiểm tra lỗi khi có sự cố trong quá trình truy vấn cơ sở dữ liệu
-     * Mục đích: Kiểm tra nếu có lỗi trong quá trình thực hiện câu lệnh SQL (chẳng hạn lỗi kết nối DB), phương thức phải xử lý đúng và trả về 0.
-     */
+    // ❌ TC6: Zero maphieu
     @Test
-    public void cancelPhieuNhap_LoiTruyVan() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-        int maphieu = 1002; // Mã phiếu nhập hợp lệ, nhưng giả lập lỗi truy vấn
-
-        // Giả lập lỗi truy vấn cơ sở dữ liệu (ví dụ lỗi kết nối DB)
-
-        // Gọi phương thức cancelPhieuNhap
-        int result = dao.cancelPhieuNhap(maphieu);
-
-        // Kiểm tra nếu kết quả trả về là 0 (không thực hiện được hành động do lỗi)
-        Assert.assertEquals(0, result);
+    public void testCancelPhieuNhap_ZeroId() throws SQLException {
+        int result = dao.cancelPhieuNhap(0);
+        assertEquals("maphieu = 0 nên trả về 0", 0, result);
     }
-
-    /**
-     * TC1: Kiểm tra lấy giá trị Auto Increment hợp lệ
-     * Mục đích: Đảm bảo rằng phương thức `getAutoIncrement()` trả về giá trị `AUTO_INCREMENT` chính xác từ cơ sở dữ liệu.
-     */
+    // Helper method to get AUTO_INCREMENT directly for verification
+    private int getAutoIncrementDirectly() throws SQLException {
+        String sql = "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES " +
+                "WHERE TABLE_SCHEMA = 'quanlikhohang' AND TABLE_NAME = 'phieunhap'";
+        try (PreparedStatement pst = testCon.prepareStatement(sql);
+             ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("AUTO_INCREMENT");
+            }
+            return -1;
+        }
+    }
+    // ✅ TC1: Valid case - phieunhap table exists with AUTO_INCREMENT
     @Test
-    public void getAutoIncrement_HopLe() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
+    public void testGetAutoIncrement_ValidTable() throws SQLException {
+        // Ensure table is empty and AUTO_INCREMENT is at least 1
+        testCon.createStatement().executeUpdate("TRUNCATE TABLE phieunhap");
 
-        // Gọi phương thức getAutoIncrement
         int result = dao.getAutoIncrement();
+        int expected = getAutoIncrementDirectly();
 
-        // Kiểm tra kết quả trả về nếu giá trị auto increment hợp lệ (kết quả cần >= 0)
-        Assert.assertTrue(result >= 0);
+        assertTrue("AUTO_INCREMENT should be positive", result > 0);
+        assertEquals("Should return correct AUTO_INCREMENT value", expected, result);
     }
 
-    /**
-     * TC2: Kiểm tra khi không có dữ liệu trong bảng
-     * Mục đích: Đảm bảo rằng nếu không có dữ liệu trong bảng, phương thức trả về giá trị -1.
-     */
-    @Test
-    public void getAutoIncrement_KhongCoDuLieu() throws SQLException {
-        PhieuNhapDAO dao = new PhieuNhapDAO();
-
-        // Giả lập trạng thái không có dữ liệu trong bảng `phieunhap`
-
-        // Gọi phương thức getAutoIncrement
-        int result = dao.getAutoIncrement();
-
-        // Kiểm tra nếu giá trị trả về là -1 khi không có dữ liệu
-        Assert.assertEquals(-1, result);
-    }
 
 
 }

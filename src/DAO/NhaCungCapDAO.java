@@ -15,46 +15,60 @@ import java.util.logging.Logger;
 import DTO.NhaCungCapDTO;
 
 public class NhaCungCapDAO implements DAOinterface<NhaCungCapDTO>{
+    public NhaCungCapDAO(Connection con) {
+    }
+    public NhaCungCapDAO() {
+    }
+
     public static NhaCungCapDAO getInstance(){
         return new NhaCungCapDAO();
     }
+
     public Connection con = ConnectionCustom.getInstance().getConnect();
+    //    public static NhaCungCapDAO getInstance(Connection con) {
+//        return new NhaCungCapDAO(con);
+//    }
     @Override
     public int insert(NhaCungCapDTO t) {
-        int result = 0 ;
+        int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
+            // Use the existing connection (con) instead of creating a new one
             String sql = "INSERT INTO `nhacungcap`(`manhacungcap`, `tennhacungcap`, `diachi`, `email`, `sdt`, `trangthai`) VALUES (?,?,?,?,?,1)";
-            PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
+            PreparedStatement pst = con.prepareStatement(sql);
             pst.setInt(1, t.getMancc());
             pst.setString(2, t.getTenncc());
             pst.setString(3, t.getDiachi());
             pst.setString(4, t.getEmail());
             pst.setString(5, t.getSdt());
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+            pst.close();
         } catch (SQLException ex) {
             Logger.getLogger(NhaCungCapDAO.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                throw ex; // Re-throw the exception to ensure test cases expecting SQLException work
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
         }
         return result;
     }
 
     @Override
-    public int update(NhaCungCapDTO t) {
-        int result = 0 ;
+    public int update(NhaCungCapDTO t) throws SQLException {
+        int result = 0;
         try {
-            Connection con = (Connection) JDBCUtil.getConnection();
             String sql = "UPDATE `nhacungcap` SET `tennhacungcap`=?,`diachi`=?,`email`=?,`sdt`=? WHERE `manhacungcap`= ?";
-            PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
+            PreparedStatement pst = con.prepareStatement(sql);
             pst.setString(1, t.getTenncc());
             pst.setString(2, t.getDiachi());
             pst.setString(3, t.getEmail());
             pst.setString(4, t.getSdt());
             pst.setInt(5, t.getMancc());
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+            pst.close();
         } catch (SQLException ex) {
             Logger.getLogger(NhaCungCapDAO.class.getName()).log(Level.SEVERE, null, ex);
+            throw ex;
         }
         return result;
     }
@@ -68,7 +82,8 @@ public class NhaCungCapDAO implements DAOinterface<NhaCungCapDTO>{
             PreparedStatement pst = (PreparedStatement) con.prepareStatement(sql);
             pst.setString(1, t);
             result = pst.executeUpdate();
-            JDBCUtil.closeConnection(con);
+//            JDBCUtil.closeConnection(con);
+            pst.close();
         } catch (SQLException ex) {
             Logger.getLogger(NhaCungCapDAO.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -113,7 +128,7 @@ public class NhaCungCapDAO implements DAOinterface<NhaCungCapDTO>{
                 String diachi = rs.getString("diachi");
                 String email = rs.getString("diachi");
                 String sdt = rs.getString("sdt");
-                
+
                 result = new NhaCungCapDTO(mancc,tenncc,diachi,email,sdt);
             }
             JDBCUtil.closeConnection(con);
@@ -142,5 +157,7 @@ public class NhaCungCapDAO implements DAOinterface<NhaCungCapDTO>{
         }
         return result;
     }
+
+
 
 }
