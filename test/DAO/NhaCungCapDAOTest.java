@@ -33,22 +33,17 @@ public class NhaCungCapDAOTest {
 //            testCon.close();
         }
     }
+    // NCC_0: Kiểm tra phương thức getInstance trả về đối tượng NhaCungCapDAO không null và là thể hiện của NhaCungCapDAO
     @Test
     public void testGetInstance() {
-        // Gọi phương thức getInstance()
         NhaCungCapDAO dao = NhaCungCapDAO.getInstance();
-
-        // Kiểm tra nếu đối tượng trả về không phải là null
         Assert.assertNotNull("NhaCungCapDAO instance should not be null", dao);
-
-        // Kiểm tra nếu đối tượng trả về là một thể hiện của NhaCungCapDAO
         Assert.assertTrue("Object should be an instance of NhaCungCapDAO", dao instanceof NhaCungCapDAO);
     }
 
-    // Test cases cho manhacungcap
+    // NCC_1: Kiểm tra chèn nhà cung cấp với mã hợp lệ (manhacungcap = 1001), mong đợi trả về 1 (thành công)
     @Test
     public void insertNhaCungCap_ValidManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với mã hợp lệ (manhacungcap = 1001) → kết quả mong đợi: 1
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -63,9 +58,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Insert should return 1 for successful insertion", 1, result);
     }
 
+    // NCC_2: Kiểm tra chèn nhà cung cấp với mã bằng 0, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_ManhacungcapZero() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với mã bằng 0 → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -79,9 +74,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_3: Kiểm tra chèn nhà cung cấp với mã âm, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_ManhacungcapNegative() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với mã âm → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -95,9 +90,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_4: Kiểm tra chèn nhà cung cấp với mã trùng (manhacungcap = 1001), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_DuplicateManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với mã trùng (manhacungcap = 1001) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -121,10 +116,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
-    // Test cases cho tennhacungcap
+    // NCC_5: Kiểm tra chèn nhà cung cấp với tên hợp lệ (tennhacungcap = "Công ty A"), mong đợi trả về 1 (thành công)
     @Test
     public void insertNhaCungCap_ValidTenncc() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với tên hợp lệ (tennhacungcap = "Công ty A") → kết quả mong đợi: 1
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -139,9 +133,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Insert should return 1 for successful insertion", 1, result);
     }
 
+    // NCC_6: Kiểm tra chèn nhà cung cấp với tên null, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_NullTenncc() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với tên null → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -155,9 +149,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_7: Kiểm tra chèn nhà cung cấp với tên rỗng, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_EmptyTenncc() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với tên rỗng → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -171,9 +165,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_8: Kiểm tra chèn nhà cung cấp với tên quá dài (>100 ký tự), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_OverlongTenncc() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với tên quá dài (>100 ký tự) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -188,9 +182,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_9: Kiểm tra chèn nhà cung cấp với tên chứa ký tự đặc biệt (tennhacungcap = "Công ty @#$%"), mong đợi trả về 1 (thành công)
     @Test
     public void insertNhaCungCap_SpecialCharTenncc() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với tên chứa ký tự đặc biệt (tennhacungcap = "Công ty @#$%") → kết quả mong đợi: 1
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -205,9 +199,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Insert should return 1 for successful insertion", 1, result);
     }
 
+    // NCC_10: Kiểm tra chèn nhà cung cấp với tên chỉ chứa khoảng trắng, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_WhitespaceTenncc() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với tên chỉ chứa khoảng trắng → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -221,10 +215,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
-    // Test cases cho diachi
+    // NCC_11: Kiểm tra chèn nhà cung cấp với địa chỉ hợp lệ (diachi = "123 Đường ABC"), mong đợi trả về 1 (thành công)
     @Test
     public void insertNhaCungCap_ValidDiachi() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với địa chỉ hợp lệ (diachi = "123 Đường ABC") → kết quả mong đợi: 1
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -239,9 +232,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Insert should return 1 for successful insertion", 1, result);
     }
 
+    // NCC_12: Kiểm tra chèn nhà cung cấp với địa chỉ null, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_NullDiachi() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với địa chỉ null → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -255,9 +248,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_13: Kiểm tra chèn nhà cung cấp với địa chỉ rỗng, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_EmptyDiachi() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với địa chỉ rỗng → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -271,9 +264,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_14: Kiểm tra chèn nhà cung cấp với địa chỉ quá dài (>200 ký tự), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_OverlongDiachi() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với địa chỉ quá dài (>200 ký tự) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -288,9 +281,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_15: Kiểm tra chèn nhà cung cấp với địa chỉ chứa ký tự đặc biệt (diachi = "123 @#$%^&*()"), mong đợi trả về 1 (thành công)
     @Test
     public void insertNhaCungCap_SpecialCharDiachi() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với địa chỉ chứa ký tự đặc biệt (diachi = "123 @#$%^&*()") → kết quả mong đợi: 1
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -305,10 +298,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Insert should return 1 for successful insertion", 1, result);
     }
 
-    // Test cases cho email
+    // NCC_16: Kiểm tra chèn nhà cung cấp với email hợp lệ (email = "test@example.com"), mong đợi trả về 1 (thành công)
     @Test
     public void insertNhaCungCap_ValidEmail() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với email hợp lệ (email = "test@example.com") → kết quả mong đợi: 1
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -323,9 +315,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Insert should return 1 for successful insertion", 1, result);
     }
 
+    // NCC_17: Kiểm tra chèn nhà cung cấp với email null, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_NullEmail() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với email null → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -339,9 +331,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_18: Kiểm tra chèn nhà cung cấp với email rỗng, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_EmptyEmail() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với email rỗng → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -355,9 +347,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_19: Kiểm tra chèn nhà cung cấp với email không có @ (email = "invalid-email"), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_NoAtEmail() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với email không có @ (email = "invalid-email") → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -371,9 +363,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_20: Kiểm tra chèn nhà cung cấp với email không có domain (email = "test@"), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_NoDomainEmail() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với email không có domain (email = "test@") → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -387,9 +379,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_21: Kiểm tra chèn nhà cung cấp với email quá dài (>100 ký tự), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_OverlongEmail() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với email quá dài (>100 ký tự) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -404,9 +396,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_22: Kiểm tra chèn nhà cung cấp với email chứa khoảng trắng (email = "test @example.com"), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_WhitespaceEmail() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với email chứa khoảng trắng (email = "test @example.com") → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -420,10 +412,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
-    // Test cases cho sdt
+    // NCC_23: Kiểm tra chèn nhà cung cấp với số điện thoại hợp lệ (sdt = "0901234567"), mong đợi trả về 1 (thành công)
     @Test
     public void insertNhaCungCap_ValidSdt() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với số điện thoại hợp lệ (sdt = "0901234567") → kết quả mong đợi: 1
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -438,9 +429,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Insert should return 1 for successful insertion", 1, result);
     }
 
+    // NCC_24: Kiểm tra chèn nhà cung cấp với số điện thoại null, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_NullSdt() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với số điện thoại null → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -454,9 +445,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_25: Kiểm tra chèn nhà cung cấp với số điện thoại rỗng, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_EmptySdt() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với số điện thoại rỗng → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -470,9 +461,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_26: Kiểm tra chèn nhà cung cấp với số điện thoại quá ngắn (<10 số), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_ShortSdt() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với số điện thoại quá ngắn (<10 số) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -486,14 +477,14 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_27: Kiểm tra chèn nhà cung cấp với số điện thoại quá dài (>20 số), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_OverlongSdt() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với số điện thoại quá dài (>20 số) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
 
-        String longSdt = "123".repeat(10); // 30 ký tự
+        String longSdt = "123".repeat(10);
         ncc.setMancc(1024);
         ncc.setTenncc("Công ty Long Sdt");
         ncc.setDiachi("202 Đường Long, Quận W");
@@ -503,9 +494,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_28: Kiểm tra chèn nhà cung cấp với số điện thoại chứa chữ cái, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_LettersSdt() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với số điện thoại chứa chữ cái → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -519,9 +510,9 @@ public class NhaCungCapDAOTest {
         dao.insert(ncc);
     }
 
+    // NCC_29: Kiểm tra chèn nhà cung cấp với số điện thoại chứa ký tự đặc biệt, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void insertNhaCungCap_SpecialCharSdt() throws SQLException {
-        // Mục đích: Kiểm tra chèn nhà cung cấp với số điện thoại chứa ký tự đặc biệt → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO();
         dao.con = testCon;
@@ -534,10 +525,10 @@ public class NhaCungCapDAOTest {
 
         dao.insert(ncc);
     }
-    // Test cases cho manhacungcap
+
+    // NCC_30: Kiểm tra cập nhật nhà cung cấp với mã hợp lệ (manhacungcap = 1001), mong đợi trả về 1 (thành công)
     @Test
     public void updateNhaCungCap_ValidManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với mã hợp lệ (manhacungcap = 1001) → kết quả mong đợi: 1
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -551,9 +542,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Update should return 1 for successful update", 1, result);
     }
 
+    // NCC_31: Kiểm tra cập nhật nhà cung cấp với mã không tồn tại (manhacungcap = 9999), mong đợi trả về 0 (thất bại)
     @Test
     public void updateNhaCungCap_NonExistentManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với mã không tồn tại (manhacungcap = 9999) → kết quả mong đợi: 0
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -567,9 +558,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Update should return 0 for non-existent manhacungcap", 0, result);
     }
 
+    // NCC_32: Kiểm tra cập nhật nhà cung cấp với mã âm (manhacungcap = -1), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_NegativeManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với mã âm (manhacungcap = -1) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -582,9 +573,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_33: Kiểm tra cập nhật nhà cung cấp với mã bằng 0 (manhacungcap = 0), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_ZeroManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với mã bằng 0 (manhacungcap = 0) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -597,10 +588,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
-    // Test cases cho tennhacungcap
+    // NCC_34: Kiểm tra cập nhật nhà cung cấp với tên hợp lệ (tennhacungcap = "Công ty ABC"), mong đợi trả về 1 (thành công)
     @Test
     public void updateNhaCungCap_ValidTenncc() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với tên hợp lệ (tennhacungcap = "Công ty ABC") → kết quả mong đợi: 1
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -614,9 +604,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Update should return 1 for successful update", 1, result);
     }
 
+    // NCC_35: Kiểm tra cập nhật nhà cung cấp với tên null, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_NullTenncc() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với tên null → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -629,9 +619,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_36: Kiểm tra cập nhật nhà cung cấp với tên rỗng, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_EmptyTenncc() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với tên rỗng → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -644,9 +634,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_37: Kiểm tra cập nhật nhà cung cấp với tên chỉ chứa khoảng trắng, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_WhitespaceTenncc() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với tên chỉ chứa khoảng trắng → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -659,9 +649,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_38: Kiểm tra cập nhật nhà cung cấp với tên quá dài (>100 ký tự), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_OverlongTenncc() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với tên quá dài (>100 ký tự) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -675,10 +665,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
-    // Test cases cho diachi
+    // NCC_39: Kiểm tra cập nhật nhà cung cấp với địa chỉ hợp lệ (diachi = "123 Đường ABC"), mong đợi trả về 1 (thành công)
     @Test
     public void updateNhaCungCap_ValidDiachi() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với địa chỉ hợp lệ (diachi = "123 Đường ABC") → kết quả mong đợi: 1
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -692,9 +681,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Update should return 1 for successful update", 1, result);
     }
 
+    // NCC_40: Kiểm tra cập nhật nhà cung cấp với địa chỉ null, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_NullDiachi() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với địa chỉ null → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -707,9 +696,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_41: Kiểm tra cập nhật nhà cung cấp với địa chỉ rỗng, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_EmptyDiachi() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với địa chỉ rỗng → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -722,9 +711,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_42: Kiểm tra cập nhật nhà cung cấp với địa chỉ quá dài (>200 ký tự), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_OverlongDiachi() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với địa chỉ quá dài (>200 ký tự) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -738,10 +727,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
-    // Test cases cho email
+    // NCC_43: Kiểm tra cập nhật nhà cung cấp với email hợp lệ (email = "abc@example.com"), mong đợi trả về 1 (thành công)
     @Test
     public void updateNhaCungCap_ValidEmail() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với email hợp lệ (email = "abc@example.com") → kết quả mong đợi: 1
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -755,9 +743,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Update should return 1 for successful update", 1, result);
     }
 
+    // NCC_44: Kiểm tra cập nhật nhà cung cấp với email null, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_NullEmail() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với email null → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -770,9 +758,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_45: Kiểm tra cập nhật nhà cung cấp với email rỗng, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_EmptyEmail() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với email rỗng → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -785,9 +773,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_46: Kiểm tra cập nhật nhà cung cấp với email không có @ (email = "invalid-email"), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_NoAtEmail() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với email không có @ (email = "invalid-email") → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -800,9 +788,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_47: Kiểm tra cập nhật nhà cung cấp với email không có domain (email = "test@"), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_NoDomainEmail() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với email không có domain (email = "test@") → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -815,9 +803,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_48: Kiểm tra cập nhật nhà cung cấp với email quá dài (>100 ký tự), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_OverlongEmail() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với email quá dài (>100 ký tự) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -831,10 +819,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
-    // Test cases cho sdt
+    // NCC_49: Kiểm tra cập nhật nhà cung cấp với số điện thoại hợp lệ (sdt = "0901234567"), mong đợi trả về 1 (thành công)
     @Test
     public void updateNhaCungCap_ValidSdt() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với số điện thoại hợp lệ (sdt = "0901234567") → kết quả mong đợi: 1
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -848,9 +835,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Update should return 1 for successful update", 1, result);
     }
 
+    // NCC_50: Kiểm tra cập nhật nhà cung cấp với số điện thoại null, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_NullSdt() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với số điện thoại null → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -863,9 +850,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_51: Kiểm tra cập nhật nhà cung cấp với số điện thoại rỗng, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_EmptySdt() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với số điện thoại rỗng → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -878,9 +865,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_52: Kiểm tra cập nhật nhà cung cấp với số điện thoại quá ngắn (<10 số), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_ShortSdt() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với số điện thoại quá ngắn (<10 số) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -893,9 +880,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_53: Kiểm tra cập nhật nhà cung cấp với số điện thoại quá dài (>20 số), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_OverlongSdt() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với số điện thoại quá dài (>20 số) → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -909,9 +896,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_54: Kiểm tra cập nhật nhà cung cấp với số điện thoại chứa chữ cái, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_LettersSdt() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với số điện thoại chứa chữ cái → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -924,9 +911,9 @@ public class NhaCungCapDAOTest {
         dao.update(ncc);
     }
 
+    // NCC_55: Kiểm tra cập nhật nhà cung cấp với số điện thoại chứa ký tự đặc biệt, mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void updateNhaCungCap_SpecialCharSdt() throws SQLException {
-        // Mục đích: Kiểm tra cập nhật với số điện thoại chứa ký tự đặc biệt → kết quả mong đợi: SQLException
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
@@ -938,13 +925,10 @@ public class NhaCungCapDAOTest {
 
         dao.update(ncc);
     }
-    // Existing test cases for insert and update (omitted for brevity)
 
-    // Test cases for delete method
+    // NCC_56: Kiểm tra xóa nhà cung cấp với mã hợp lệ (manhacungcap = "1001"), mong đợi trả về 1 (thành công)
     @Test
     public void deleteNhaCungCap_ValidManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra xóa nhà cung cấp với mã hợp lệ (manhacungcap = "1001") → kết quả mong đợi: 1
-        // First, insert a record to ensure it exists
         NhaCungCapDTO ncc = new NhaCungCapDTO();
         ncc.setMancc(1001);
         ncc.setTenncc("Công ty ABC");
@@ -956,60 +940,58 @@ public class NhaCungCapDAOTest {
         int insertResult = dao.insert(ncc);
         assertEquals("Insert should succeed", 1, insertResult);
 
-        // Test delete
         int result = dao.delete("1001");
         assertEquals("Delete should return 1 for successful deletion", 1, result);
     }
 
+    // NCC_57: Kiểm tra xóa nhà cung cấp với mã không tồn tại (manhacungcap = "9999"), mong đợi trả về 0 (thất bại)
     @Test
     public void deleteNhaCungCap_NonExistentManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra xóa nhà cung cấp với mã không tồn tại (manhacungcap = "9999") → kết quả mong đợi: 0
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
         int result = dao.delete("9999");
         assertEquals("Delete should return 0 for non-existent manhacungcap", 0, result);
     }
 
+    // NCC_58: Kiểm tra xóa nhà cung cấp với mã rỗng (manhacungcap = ""), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void deleteNhaCungCap_EmptyManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra xóa nhà cung cấp với mã rỗng (manhacungcap = "") → kết quả mong đợi: SQLException
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
         dao.delete("");
     }
 
+    // NCC_59: Kiểm tra xóa nhà cung cấp với mã null (manhacungcap = null), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void deleteNhaCungCap_NullManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra xóa nhà cung cấp với mã NULL (manhacungcap = null) → kết quả mong đợi: SQLException
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
         dao.delete(null);
     }
 
+    // NCC_60: Kiểm tra xóa nhà cung cấp với mã âm (manhacungcap = "-1001"), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void deleteNhaCungCap_NegativeManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra xóa nhà cung cấp với mã âm (manhacungcap = "-1001") → kết quả mong đợi: SQLException
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
         dao.delete("-1001");
     }
 
+    // NCC_61: Kiểm tra xóa nhà cung cấp với mã chứa ký tự đặc biệt (manhacungcap = "@#1001"), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void deleteNhaCungCap_SpecialCharManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra xóa nhà cung cấp với mã chứa ký tự đặc biệt (manhacungcap = "@#1001") → kết quả mong đợi: SQLException
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
         dao.delete("@#1001");
     }
 
+    // NCC_62: Kiểm tra xóa nhà cung cấp với mã chỉ chứa khoảng trắng (manhacungcap = " "), mong đợi ném SQLException
     @Test(expected = SQLException.class)
     public void deleteNhaCungCap_WhitespaceManhacungcap() throws SQLException {
-        // Mục đích: Kiểm tra xóa nhà cung cấp với mã chỉ chứa khoảng trắng (manhacungcap = " ") → kết quả mong đợi: SQLException
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
         dao.delete(" ");
     }
-    // Test cases for selectAll method
+
+    // NCC_63: Kiểm tra selectAll trả về danh sách nhà cung cấp hợp lệ khi có dữ liệu, mong đợi trả về đúng 2 bản ghi
     @Test
     public void selectAll_ValidData_ReturnsList() throws SQLException {
-        // Mục đích: Kiểm tra selectAll trả về danh sách nhà cung cấp hợp lệ khi có dữ liệu
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
-        // Insert test data
         NhaCungCapDTO ncc1 = new NhaCungCapDTO(1001, "Công ty A", "123 Đường A", "a@example.com", "0901234567");
         NhaCungCapDTO ncc2 = new NhaCungCapDTO(1002, "Công ty B", "456 Đường B", "b@example.com", "0901234568");
         dao.insert(ncc1);
@@ -1022,9 +1004,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Second supplier name should be Công ty B", "Công ty B", result.get(1).getTenncc());
     }
 
+    // NCC_64: Kiểm tra selectAll trả về danh sách rỗng khi không có dữ liệu
     @Test
     public void selectAll_NoData_ReturnsEmptyList() throws SQLException {
-        // Mục đích: Kiểm tra selectAll trả về danh sách rỗng khi không có dữ liệu
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
         ArrayList<NhaCungCapDTO> result = dao.selectAll();
@@ -1032,16 +1014,14 @@ public class NhaCungCapDAOTest {
         assertTrue("Should return empty list when no data", result.isEmpty());
     }
 
+    // NCC_65: Kiểm tra selectAll chỉ trả về nhà cung cấp có trạng thái = 1, mong đợi trả về 1 bản ghi hoạt động
     @Test
     public void selectAll_OnlyActiveSuppliers_ReturnsActiveOnly() throws SQLException {
-        // Mục đích: Kiểm tra selectAll chỉ trả về nhà cung cấp có trạng thái = 1
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
-        // Insert test data (one active, one inactive)
         NhaCungCapDTO ncc1 = new NhaCungCapDTO(1001, "Công ty A", "123 Đường A", "a@example.com", "0901234567");
         dao.insert(ncc1);
 
-        // Insert inactive supplier directly to bypass potential DAO logic
         String sql = "INSERT INTO nhacungcap (manhacungcap, tennhacungcap, diachi, email, sdt, trangthai) " +
                 "VALUES (1002, 'Công ty B', '456 Đường B', 'b@example.com', '0901234568', 0)";
         testCon.createStatement().executeUpdate(sql);
@@ -1052,13 +1032,11 @@ public class NhaCungCapDAOTest {
         assertEquals("Supplier ID should be 1001", 1001, result.get(0).getMancc());
     }
 
-    // Test cases for selectById method
+    // NCC_66: Kiểm tra selectById trả về nhà cung cấp đúng khi ID hợp lệ (manhacungcap = "1001")
     @Test
     public void selectById_ValidId_ReturnsSupplier() throws SQLException {
-        // Mục đích: Kiểm tra selectById trả về nhà cung cấp đúng khi ID hợp lệ
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
-        // Insert test data
         NhaCungCapDTO ncc = new NhaCungCapDTO(1001, "Công ty A", "123 Đường A", "a@example.com", "0901234567");
         dao.insert(ncc);
 
@@ -1069,9 +1047,9 @@ public class NhaCungCapDAOTest {
         assertEquals("Supplier name should be Công ty A", "Công ty A", result.getTenncc());
     }
 
+    // NCC_67: Kiểm tra selectById trả về null khi ID không tồn tại (manhacungcap = "9999")
     @Test
     public void selectById_NonExistentId_ReturnsNull() throws SQLException {
-        // Mục đích: Kiểm tra selectById trả về null khi ID không tồn tại
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
         NhaCungCapDTO result = dao.selectById("9999");
@@ -1079,34 +1057,33 @@ public class NhaCungCapDAOTest {
         assertNull("Should return null for non-existent ID", result);
     }
 
+    // NCC_68: Kiểm tra selectById ném SQLException khi ID là null
     @Test(expected = SQLException.class)
     public void selectById_NullId_ThrowsSQLException() throws SQLException {
-        // Mục đích: Kiểm tra selectById ném SQLException khi ID là null
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
         dao.selectById(null);
     }
 
+    // NCC_69: Kiểm tra selectById ném SQLException khi ID rỗng (manhacungcap = "")
     @Test(expected = SQLException.class)
     public void selectById_EmptyId_ThrowsSQLException() throws SQLException {
-        // Mục đích: Kiểm tra selectById ném SQLException khi ID rỗng
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
         dao.selectById("");
     }
 
+    // NCC_70: Kiểm tra selectById ném SQLException khi ID không phải số (manhacungcap = "abc")
     @Test(expected = SQLException.class)
     public void selectById_NonNumericId_ThrowsSQLException() throws SQLException {
-        // Mục đích: Kiểm tra selectById ném SQLException khi ID không phải số
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
         dao.selectById("abc");
     }
 
-    // Test cases for getAutoIncrement method
+    // NCC_71: Kiểm tra getAutoIncrement trả về giá trị AUTO_INCREMENT hợp lệ, mong đợi giá trị dương
     @Test
     public void getAutoIncrement_ValidTable_ReturnsPositiveValue() throws SQLException {
-        // Mục đích: Kiểm tra getAutoIncrement trả về giá trị AUTO_INCREMENT hợp lệ
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
         int result = dao.getAutoIncrement();
@@ -1114,14 +1091,13 @@ public class NhaCungCapDAOTest {
         assertTrue("AUTO_INCREMENT should be positive", result > 0);
     }
 
+    // NCC_72: Kiểm tra getAutoIncrement tăng giá trị sau khi chèn bản ghi
     @Test
     public void getAutoIncrement_AfterInsert_ReturnsIncrementedValue() throws SQLException {
-        // Mục đích: Kiểm tra getAutoIncrement tăng giá trị sau khi chèn bản ghi
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
         int initialValue = dao.getAutoIncrement();
 
-        // Insert a record
         NhaCungCapDTO ncc = new NhaCungCapDTO(1001, "Công ty A", "123 Đường A", "a@example.com", "0901234567");
         dao.insert(ncc);
 
@@ -1130,17 +1106,15 @@ public class NhaCungCapDAOTest {
         assertTrue("AUTO_INCREMENT should increase after insert", newValue > initialValue);
     }
 
+    // NCC_73: Kiểm tra getAutoIncrement trả về -1 khi bảng không tồn tại
     @Test
     public void getAutoIncrement_NonExistentTable_ReturnsNegativeOne() throws SQLException {
-        // Mục đích: Kiểm tra getAutoIncrement trả về -1 khi bảng không tồn tại
         NhaCungCapDAO dao = new NhaCungCapDAO(testCon);
 
-        // Temporarily rename the table to simulate non-existent table
         testCon.createStatement().executeUpdate("RENAME TABLE nhacungcap TO nhacungcap_temp");
 
         int result = dao.getAutoIncrement();
 
-        // Restore table name
         testCon.createStatement().executeUpdate("RENAME TABLE nhacungcap_temp TO nhacungcap");
 
         assertEquals("Should return -1 for non-existent table", -1, result);
