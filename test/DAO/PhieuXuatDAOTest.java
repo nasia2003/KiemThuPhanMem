@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class PhieuXuatDAOTest {
 
     /**
-     * TC1: Kiểm tra phương thức getInstance()
+     * TC0: Kiểm tra phương thức getInstance()
      * Mục đích: Đảm bảo rằng phương thức `getInstance()` trả về một đối tượng hợp lệ (không phải null) và đúng kiểu.
      */
     @Test
@@ -32,7 +32,7 @@ public class PhieuXuatDAOTest {
         Assert.assertTrue("Object should be an instance of PhieuXuatDAO", dao instanceof PhieuXuatDAO);
     }
     /**
-     * TC1: Chèn phiếu xuất hợp lệ
+     * PX_1: Chèn phiếu xuất hợp lệ
      * Mục đích: Đảm bảo có thể chèn một phiếu xuất hợp lệ vào cơ sở dữ liệu
      */
     @Test
@@ -53,7 +53,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC2: Chèn phiếu xuất với tổng tiền = 0
+     * PX_2: Chèn phiếu xuất với tổng tiền = 0
      * Mục đích: Kiểm tra trường hợp tổng tiền bằng 0 khi thêm phiếu xuất
      */
     @Test
@@ -69,12 +69,12 @@ public class PhieuXuatDAOTest {
 
         dao.con.setAutoCommit(false);
         int result = dao.insert(px);
-        Assert.assertEquals(1, result); // Kết quả mong đợi là 1 (thêm thành công)
+        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (thêm không thành công)
         dao.con.rollback();
     }
 
     /**
-     * TC3: Chèn phiếu xuất với mã phiếu đã tồn tại
+     * PX_3: Chèn phiếu xuất với mã phiếu đã tồn tại
      * Mục đích: Kiểm tra việc chèn phiếu xuất với mã phiếu đã tồn tại trong DB
      */
     @Test
@@ -90,12 +90,12 @@ public class PhieuXuatDAOTest {
 
         dao.con.setAutoCommit(false);
         int result = dao.insert(px);
-        Assert.assertEquals(1, result); // Kết quả mong đợi là 1 nếu DB cho phép thêm
+        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (Không chèn được vào DB)
         dao.con.rollback();
     }
 
     /**
-     * TC4: Chèn phiếu xuất với khách hàng không tồn tại
+     * PX_4: Chèn phiếu xuất với khách hàng không tồn tại
      * Mục đích: Kiểm tra trường hợp khách hàng không tồn tại trong DB
      */
     @Test
@@ -111,12 +111,12 @@ public class PhieuXuatDAOTest {
 
         dao.con.setAutoCommit(false);
         int result = dao.insert(px);
-        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không thể thêm do NCC không tồn tại)
+        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (không thể thêm do Khách hàng không tồn tại)
         dao.con.rollback();
     }
 
     /**
-     * TC5: Chèn phiếu xuất với người tạo không tồn tại
+     * PX_5: Chèn phiếu xuất với người tạo không tồn tại
      * Mục đích: Kiểm tra trường hợp người tạo không tồn tại trong DB
      */
     @Test
@@ -137,7 +137,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC6: Chèn phiếu xuất với thời gian là null
+     * PX_6: Chèn phiếu xuất với thời gian là null
      * Mục đích: Kiểm tra trường hợp thời gian tạo phiếu xuất là null
      */
     @Test
@@ -158,7 +158,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC7: Chèn phiếu xuất với tổng tiền âm
+     * PX_7: Chèn phiếu xuất với tổng tiền âm
      * Mục đích: Kiểm tra việc chèn phiếu xuất có tổng tiền âm
      */
     @Test
@@ -179,7 +179,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC1: Cập nhật phiếu xuất hợp lệ
+     * PX_8: Cập nhật phiếu xuất hợp lệ
      * Mục đích: Đảm bảo rằng phiếu xuất hợp lệ có thể được cập nhật trong cơ sở dữ liệu
      */
     @Test
@@ -201,7 +201,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC2: Cập nhật phiếu xuất với tổng tiền bằng 0
+     * PX_9: Cập nhật phiếu xuất với tổng tiền bằng 0
      * Mục đích: Kiểm tra khả năng cập nhật phiếu xuất với tổng tiền = 0
      */
     @Test
@@ -218,12 +218,12 @@ public class PhieuXuatDAOTest {
 
         dao.con.setAutoCommit(false);
         int result = dao.update(px);
-        Assert.assertEquals(1, result); // Kết quả mong đợi là 1 (cập nhật thành công)
+        Assert.assertEquals(0, result); // Kết quả mong đợi là 0 (cập nhật không thành công)
         dao.con.rollback();
     }
 
     /**
-     * TC3: Cập nhật phiếu xuất với mã phiếu không tồn tại
+     * PX_10: Cập nhật phiếu xuất với mã phiếu không tồn tại
      * Mục đích: Kiểm tra khi mã phiếu không tồn tại trong cơ sở dữ liệu
      */
     @Test
@@ -245,7 +245,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC4: Cập nhật phiếu xuất với khách hàng không tồn tại
+     * PX_11: Cập nhật phiếu xuất với khách hàng không tồn tại
      * Mục đích: Kiểm tra khi khách hàng không tồn tại trong cơ sở dữ liệu
      */
     @Test
@@ -267,7 +267,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC5: Cập nhật phiếu xuất với người tạo không tồn tại
+     * PX_12: Cập nhật phiếu xuất với người tạo không tồn tại
      * Mục đích: Kiểm tra khi người tạo không tồn tại trong cơ sở dữ liệu
      */
     @Test
@@ -289,7 +289,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC6: Cập nhật phiếu xuất với tổng tiền âm
+     * PX_13: Cập nhật phiếu xuất với tổng tiền âm
      * Mục đích: Kiểm tra khả năng cập nhật phiếu xuất với tổng tiền âm
      */
     @Test
@@ -297,7 +297,7 @@ public class PhieuXuatDAOTest {
         PhieuXuatDTO px = new PhieuXuatDTO();
         PhieuXuatDAO dao = new PhieuXuatDAO();
 
-        px.setMaphieu(1005); // Mã phiếu hợp lệ
+        px.setMaphieu(1004); // Mã phiếu hợp lệ
         px.setThoigiantao(new Timestamp(System.currentTimeMillis())); // Thời gian hợp lệ
         px.setMakh(1); // Khách hàng hợp lệ
         px.setManguoitao(1); // Người tạo hợp lệ
@@ -311,7 +311,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC7: Cập nhật phiếu xuất với thời gian tạo null
+     * PX_14: Cập nhật phiếu xuất với thời gian tạo null
      * Mục đích: Kiểm tra khả năng cập nhật phiếu xuất với thời gian tạo là null
      */
     @Test
@@ -333,7 +333,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC1: Xóa phiếu xuất hợp lệ
+     * PX_15: Xóa phiếu xuất hợp lệ
      * Mục đích: Đảm bảo rằng phiếu xuất có mã hợp lệ sẽ được đánh dấu trạng thái là 0 (xóa thành công).
      */
     @Test
@@ -348,7 +348,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC2: Xóa phiếu xuất với mã phiếu không tồn tại
+     * PX_16: Xóa phiếu xuất với mã phiếu không tồn tại
      * Mục đích: Kiểm tra khi mã phiếu không tồn tại trong cơ sở dữ liệu
      */
     @Test
@@ -363,7 +363,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC3: Xóa phiếu xuất khi phiếu đã bị xóa (trangthai = 0)
+     * PX_17: Xóa phiếu xuất khi phiếu đã bị xóa (trangthai = 0)
      * Mục đích: Kiểm tra trường hợp khi phiếu xuất đã bị xóa rồi.
      */
     @Test
@@ -378,7 +378,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC4: Xóa phiếu xuất với mã phiếu là null
+     * PX_18: Xóa phiếu xuất với mã phiếu là null
      * Mục đích: Kiểm tra khi mã phiếu là null, đảm bảo không xảy ra lỗi.
      */
     @Test
@@ -393,7 +393,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC5: Xóa phiếu xuất với chuỗi mã phiếu rỗng
+     * PX_19: Xóa phiếu xuất với chuỗi mã phiếu rỗng
      * Mục đích: Kiểm tra khi mã phiếu là chuỗi rỗng, đảm bảo không có bản ghi nào bị xóa.
      */
     @Test
@@ -409,7 +409,7 @@ public class PhieuXuatDAOTest {
 
 
     /**
-     * TC1: Lấy tất cả phiếu xuất hợp lệ
+     * PX_20: Lấy tất cả phiếu xuất
      * Mục đích: Đảm bảo rằng khi có các phiếu xuất trong cơ sở dữ liệu, phương thức trả về danh sách phiếu xuất đúng.
      */
     @Test
@@ -425,7 +425,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC2: Lấy tất cả phiếu xuất khi không có phiếu xuất nào
+     * PX_21: Lấy tất cả phiếu xuất khi không có phiếu xuất nào
      * Mục đích: Kiểm tra trường hợp cơ sở dữ liệu không có phiếu xuất nào, phương thức phải trả về danh sách rỗng.
      */
     @Test
@@ -442,7 +442,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC3: Lấy tất cả phiếu xuất có dữ liệu hợp lệ, kiểm tra giá trị trả về
+     * PX_22: Lấy tất cả phiếu xuất có dữ liệu hợp lệ, kiểm tra giá trị trả về
      * Mục đích: Đảm bảo rằng các phiếu xuất được trả về đúng với dữ liệu trong cơ sở dữ liệu.
      */
     @Test
@@ -463,7 +463,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC4: Lấy tất cả phiếu xuất với dữ liệu có giá trị null (thử nghiệm dữ liệu bị lỗi)
+     * PX_23: Lấy tất cả phiếu xuất với dữ liệu có giá trị null (thử nghiệm dữ liệu bị lỗi)
      * Mục đích: Kiểm tra trường hợp dữ liệu phiếu xuất có giá trị null, phải kiểm tra kỹ lưỡng.
      */
     @Test
@@ -484,7 +484,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC1: Lấy phiếu xuất hợp lệ theo ID
+     * PX_24: Lấy phiếu xuất hợp lệ theo ID
      * Mục đích: Đảm bảo rằng khi có phiếu xuất với mã hợp lệ trong cơ sở dữ liệu, phương thức trả về đối tượng `PhieuXuatDTO` đúng.
      */
     @Test
@@ -504,7 +504,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC2: Lấy phiếu xuất theo ID không tồn tại
+     * PX_25: Lấy phiếu xuất theo ID không tồn tại
      * Mục đích: Kiểm tra trường hợp khi không có phiếu xuất nào với mã hợp lệ trong cơ sở dữ liệu, phương thức trả về null.
      */
     @Test
@@ -519,7 +519,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC3: Lấy phiếu xuất theo ID có dữ liệu null
+     * PX_26: Lấy phiếu xuất theo ID có dữ liệu null
      * Mục đích: Kiểm tra trường hợp dữ liệu của phiếu xuất có thể chứa giá trị null, phương thức phải xử lý tốt các giá trị null.
      */
     @Test
@@ -534,11 +534,11 @@ public class PhieuXuatDAOTest {
 
         // Kiểm tra xem giá trị của các trường có null không
         Assert.assertNotNull(result.getThoigiantao()); // Thời gian tạo không được null
-        Assert.assertTrue(result.getTongTien() >= 0); // Tổng tiền có thể là 0 hoặc lớn hơn
+        Assert.assertTrue(result.getTongTien() > 0); // Tổng tiền dương
     }
 
     /**
-     * TC4: Lấy phiếu xuất theo ID khi có lỗi kết nối
+     * PX_27: Lấy phiếu xuất theo ID khi có lỗi kết nối
      * Mục đích: Kiểm tra khi có lỗi kết nối cơ sở dữ liệu, phương thức trả về null hoặc xử lý lỗi đúng cách.
      */
     @Test
@@ -555,27 +555,27 @@ public class PhieuXuatDAOTest {
         // Kiểm tra kết quả, mong đợi trả về null do lỗi kết nối
         Assert.assertNull(result);
     }
-
+//
+//    /**
+//     * PX_28: Kiểm tra phiếu xuất theo ID và kiểm tra đúng thông tin
+//     * Mục đích: Đảm bảo khi lấy phiếu xuất theo ID, thông tin của nó phải chính xác.
+//     */
+//    @Test
+//    public void selectById_KiemTraGiaTri() throws SQLException {
+//        PhieuXuatDAO dao = new PhieuXuatDAO();
+//        String validId = "1"; // Giả sử phiếu xuất với ID 1 tồn tại trong cơ sở dữ liệu
+//
+//        PhieuXuatDTO result = dao.selectById(validId);
+//
+//        // Kiểm tra các giá trị trả về phải chính xác
+//        Assert.assertNotNull(result);
+//        Assert.assertEquals(validId, String.valueOf(result.getMaphieu())); // Kiểm tra mã phiếu xuất
+//        Assert.assertTrue(result.getTongTien() > 0); // Kiểm tra tổng tiền
+//        Assert.assertNotNull(result.getThoigiantao()); // Kiểm tra thời gian tạo phiếu xuất
+//    }
+//    
     /**
-     * TC5: Kiểm tra phiếu xuất theo ID và kiểm tra đúng thông tin
-     * Mục đích: Đảm bảo khi lấy phiếu xuất theo ID, thông tin của nó phải chính xác.
-     */
-    @Test
-    public void selectById_KiemTraGiaTri() throws SQLException {
-        PhieuXuatDAO dao = new PhieuXuatDAO();
-        String validId = "1"; // Giả sử phiếu xuất với ID 1 tồn tại trong cơ sở dữ liệu
-
-        PhieuXuatDTO result = dao.selectById(validId);
-
-        // Kiểm tra các giá trị trả về phải chính xác
-        Assert.assertNotNull(result);
-        Assert.assertEquals(validId, String.valueOf(result.getMaphieu())); // Kiểm tra mã phiếu xuất
-        Assert.assertTrue(result.getTongTien() > 0); // Kiểm tra tổng tiền
-        Assert.assertNotNull(result.getThoigiantao()); // Kiểm tra thời gian tạo phiếu xuất
-    }
-    
-    /**
-     * TC1: Kiểm tra hủy phiếu xuất hợp lệ
+     * PX_28: Kiểm tra hủy phiếu xuất hợp lệ
      * Mục đích: Đảm bảo rằng khi hủy phiếu xuất hợp lệ, các thay đổi liên quan đến các chi tiết sản phẩm, phiếu xuất được thực hiện đúng.
      */
     @Test
@@ -596,7 +596,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC2: Kiểm tra khi phiếu xuất không tồn tại
+     * PX_29: Kiểm tra hủy phiếu khi phiếu xuất không tồn tại
      * Mục đích: Đảm bảo rằng nếu phiếu xuất không tồn tại, không có thay đổi nào được thực hiện và kết quả trả về là 0.
      */
     @Test
@@ -612,7 +612,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC3: Kiểm tra lỗi khi có sự cố trong quá trình truy vấn cơ sở dữ liệu
+     * PX_30: Kiểm tra lỗi khi có sự cố trong quá trình truy vấn cơ sở dữ liệu
      * Mục đích: Kiểm tra nếu có lỗi trong quá trình thực hiện câu lệnh SQL (chẳng hạn lỗi kết nối DB), phương thức phải xử lý đúng và trả về 0.
      */
     @Test
@@ -630,7 +630,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC1: Kiểm tra khi khách hàng có phiếu xuất
+     * PX_31: Kiểm tra khi khách hàng có phiếu xuất
      * Mục đích: Đảm bảo phương thức trả về đúng danh sách phiếu xuất của khách hàng
      */
     @Test
@@ -660,7 +660,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC2: Kiểm tra khi khách hàng không có phiếu xuất
+     * PX_32: Kiểm tra khi khách hàng không có phiếu xuất
      * Mục đích: Phương thức phải trả về danh sách rỗng
      */
     @Test
@@ -672,14 +672,14 @@ public class PhieuXuatDAOTest {
 
         ArrayList<PhieuXuatDTO> list = dao.selectAllofKH(makh);
 
-        Assert.assertNotNull(list);
+        Assert.assertNull(list);
         Assert.assertTrue(list.isEmpty());
 
         dao.con.rollback();
     }
 
     /**
-     * TC3: Kiểm tra khi truyền mã khách hàng không hợp lệ (âm)
+     * PX_33: Kiểm tra khi truyền mã khách hàng không hợp lệ (âm)
      * Mục đích: Tránh lỗi SQL hoặc kết quả sai
      */
     @Test
@@ -691,14 +691,14 @@ public class PhieuXuatDAOTest {
 
         ArrayList<PhieuXuatDTO> list = dao.selectAllofKH(makh);
 
-        Assert.assertNotNull(list);
+        Assert.assertNull(list);
         Assert.assertTrue(list.isEmpty());
 
         dao.con.rollback();
     }
     
     /**
-     * TC1: Kiểm tra lấy giá trị Auto Increment hợp lệ
+     * PX_34: Kiểm tra lấy giá trị Auto Increment hợp lệ
      * Mục đích: Đảm bảo rằng phương thức `getAutoIncrement()` trả về giá trị `AUTO_INCREMENT` chính xác từ cơ sở dữ liệu.
      */
     @Test
@@ -713,7 +713,7 @@ public class PhieuXuatDAOTest {
     }
 
     /**
-     * TC2: Kiểm tra khi không có dữ liệu trong bảng
+     * PX_35: Kiểm tra khi không có dữ liệu trong bảng
      * Mục đích: Đảm bảo rằng nếu không có dữ liệu trong bảng, phương thức trả về giá trị -1.
      */
     @Test

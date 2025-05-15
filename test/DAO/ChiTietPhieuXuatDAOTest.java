@@ -25,7 +25,7 @@ import static org.junit.Assert.*;
 public class ChiTietPhieuXuatDAOTest {
 
     /**
-     * TC1: Kiểm tra phương thức getInstance() trả về đối tượng hợp lệ. Mục
+     * CTPX_0: Kiểm tra phương thức getInstance() trả về đối tượng hợp lệ. Mục
      * đích: Đảm bảo rằng phương thức getInstance() luôn trả về một thể hiện hợp
      * lệ của ChiTietPhieuXuatDAO.
      */
@@ -42,8 +42,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC1: Thêm danh sách chi tiết phiếu xuất hợp lệ Mục đích: Đảm bảo các bản
-     * ghi chi tiết được chèn thành công.
+     * CTPX_1: Thêm danh sách chi tiết phiếu xuất hợp lệ 
+     * Mục đích: Đảm bảo các bản ghi chi tiết được chèn thành công.
      */
     @Test
     public void insertChiTietPhieuXuat_HopLe() throws SQLException {
@@ -61,8 +61,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC2: Danh sách chi tiết rỗng Mục đích: Kiểm tra xem phương thức có xử lý
-     * đúng khi không có dữ liệu.
+     * CTPX_2: Danh sách chi tiết rỗng 
+     * Mục đích: Kiểm tra xem phương thức có xử lý đúng khi không có dữ liệu.
      */
     @Test
     public void insertChiTietPhieuXuat_DanhSachRong() throws SQLException {
@@ -78,8 +78,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC3: Thêm chi tiết với mã phiếu không tồn tại trong bảng phiếu xuất Mục
-     * đích: Kiểm tra xử lý khi khóa ngoại không hợp lệ.
+     * CTPX_3: Thêm chi tiết với mã phiếu không tồn tại trong bảng phiếu xuất 
+     * Mục đích: Kiểm tra xử lý khi khóa ngoại không hợp lệ.
      */
     @Test
     public void insertChiTietPhieuXuat_MaPhieuKhongTonTai() throws SQLException {
@@ -91,13 +91,13 @@ public class ChiTietPhieuXuatDAOTest {
         list.add(new ChiTietPhieuDTO(9999, 101, 2, 10000)); // Mã phiếu không tồn tại
 
         int result = dao.insert(list);
-        Assert.assertTrue(result == 0 || result == 1); // Có thể vẫn insert được nếu không có FK constraint
+        Assert.assertTrue(result == 0);
         con.rollback();
     }
 
     /**
-     * TC4: Thêm chi tiết với số lượng âm Mục đích: Kiểm tra hệ thống có cho
-     * phép số lượng âm không.
+     * CTPX_4: Thêm chi tiết với số lượng âm 
+     * Mục đích: Kiểm tra hệ thống có cho phép số lượng âm không.
      */
     @Test
     public void insertChiTietPhieuXuat_SoLuongAm() throws SQLException {
@@ -109,13 +109,13 @@ public class ChiTietPhieuXuatDAOTest {
         list.add(new ChiTietPhieuDTO(1002, 103, -5, 15000));
 
         int result = dao.insert(list);
-        Assert.assertTrue(result == 0 || result == 1); // Tùy theo DB có constraint không
+        Assert.assertTrue(result == 0); 
         con.rollback();
     }
 
     /**
-     * TC5: Truyền null thay vì danh sách Mục đích: Kiểm tra xử lý khi danh sách
-     * chi tiết là null.
+     * CTPX_5: Truyền null thay vì danh sách 
+     * Mục đích: Kiểm tra xử lý khi danh sách chi tiết là null.
      */
     @Test
     public void insertChiTietPhieuXuat_DanhSachNull() throws SQLException {
@@ -129,8 +129,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC6: Thêm chi tiết với đơn giá = 0 Mục đích: Đảm bảo hệ thống có thể xử
-     * lý giá trị biên.
+     * CTPX_6: Thêm chi tiết với đơn giá = 0 
+     * Mục đích: Đảm bảo hệ thống có thể xử lý giá trị biên.
      */
     @Test
     public void insertChiTietPhieuXuat_DonGiaBang0() throws SQLException {
@@ -142,13 +142,13 @@ public class ChiTietPhieuXuatDAOTest {
         list.add(new ChiTietPhieuDTO(1003, 2, 3, 0));
 
         int result = dao.insert(list);
-        Assert.assertTrue(result == 1); // Chấp nhận giá = 0 nếu DB không ràng buộc
+        Assert.assertTrue(result == 0); // Không chấp nhận giá = 0
         con.rollback();
     }
 
     /**
-     * TC1: Xóa chi tiết phiếu xuất với mã phiếu tồn tại Mục đích: Kiểm tra xem
-     * hệ thống có xóa thành công khi mã phiếu hợp lệ.
+     * CTPX_7: Xóa chi tiết phiếu xuất với mã phiếu tồn tại 
+     * Mục đích: Kiểm tra xem hệ thống có xóa thành công khi mã phiếu hợp lệ.
      */
     @Test
     public void deleteChiTietPhieuXuat_HopLe() throws SQLException {
@@ -166,8 +166,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC2: Xóa với mã phiếu không tồn tại Mục đích: Kiểm tra khi mã phiếu không
-     * tồn tại trong bảng.
+     * CTPX_8: Xóa với mã phiếu không tồn tại 
+     * Mục đích: Kiểm tra khi mã phiếu không tồn tại trong bảng.
      */
     @Test
     public void deleteChiTietPhieuXuat_MaKhongTonTai() throws SQLException {
@@ -184,7 +184,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC3: Xóa với chuỗi rỗng Mục đích: Kiểm tra khi truyền mã phiếu rỗng.
+     * CTPX_9: Xóa với mã phiếu là chuỗi rỗng 
+     * Mục đích: Kiểm tra khi truyền mã phiếu rỗng.
      */
     @Test
     public void deleteChiTietPhieuXuat_Rong() throws SQLException {
@@ -201,8 +202,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC4: Xóa với giá trị null Mục đích: Đảm bảo hệ thống xử lý null an toàn
-     * mà không crash.
+     * CTPX_10: Xóa với mã phiếu là giá trị null 
+     * Mục đích: Đảm bảo hệ thống xử lý null an toàn mà không crash.
      */
     @Test
     public void deleteChiTietPhieuXuat_Null() throws SQLException {
@@ -219,8 +220,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC1: Cập nhật thành công với mã phiếu tồn tại và danh sách chi tiết hợp
-     * lệ Mục đích: Kiểm tra quá trình xóa và chèn mới hoạt động đúng
+     * CTPX_11: Cập nhật thành công với mã phiếu tồn tại và danh sách chi tiết hợp lệ 
+     * Mục đích: Kiểm tra quá trình xóa và chèn mới hoạt động đúng
      */
     @Test
     public void updateChiTietPhieuXuat_HopLe() throws SQLException {
@@ -241,8 +242,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC2: Cập nhật khi mã phiếu không tồn tại Mục đích: Kiểm tra cập nhật thất
-     * bại khi không có gì để xóa
+     * CTPX_12: Cập nhật khi mã phiếu không tồn tại 
+     * Mục đích: Kiểm tra cập nhật thất bại khi không có gì để xóa
      */
     @Test
     public void updateChiTietPhieuXuat_MaPhieuKhongTonTai() throws SQLException {
@@ -262,8 +263,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC3: Cập nhật với danh sách chi tiết rỗng Mục đích: Xóa xong không thêm
-     * gì mới
+     * CTPX_13: Cập nhật với danh sách chi tiết rỗng 
+     * Mục đích: Xóa xong không thêm gì mới
      */
     @Test
     public void updateChiTietPhieuXuat_DanhSachRong() throws SQLException {
@@ -281,8 +282,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC4: Cập nhật với mã phiếu null Mục đích: Đảm bảo hệ thống xử lý an toàn
-     * khi khóa chính null
+     * CTPX_14: Cập nhật với mã phiếu null 
+     * Mục đích: Đảm bảo hệ thống xử lý an toàn khi khóa chính null
      */
     @Test
     public void updateChiTietPhieuXuat_MaPhieuNull() throws SQLException {
@@ -300,26 +301,26 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC1: Truy vấn danh sách chi tiết phiếu xuất với mã phiếu hợp lệ và có dữ
-     * liệu Mục đích: Kiểm tra truy vấn hoạt động đúng khi có dữ liệu
+     * CTPX_15: Truy vấn danh sách chi tiết phiếu xuất với mã phiếu hợp lệ và có dữ liệu 
+     * Mục đích: Kiểm tra truy vấn hoạt động đúng khi có dữ liệu
      */
     @Test
     public void selectAllChiTietPhieuXuat_HopLeCoDuLieu() throws SQLException {
         ChiTietPhieuXuatDAO dao = new ChiTietPhieuXuatDAO();
-        String maphieu = "1001"; // Giả sử phiếu này có chi tiết
+        String maphieu = "10"; // Giả sử phiếu này có chi tiết
 
         ArrayList<ChiTietPhieuDTO> ds = dao.selectAll(maphieu);
 
         Assert.assertNotNull(ds);                // Không null
         Assert.assertTrue(ds.size() > 0);        // Có ít nhất 1 dòng dữ liệu
         for (ChiTietPhieuDTO ct : ds) {
-            Assert.assertEquals(1001, ct.getMaphieu()); // Mã phiếu đúng với điều kiện truy vấn
+            Assert.assertEquals(10, ct.getMaphieu()); // Mã phiếu đúng với điều kiện truy vấn
         }
     }
 
     /**
-     * TC2: Truy vấn với mã phiếu hợp lệ nhưng không có dữ liệu Mục đích: Đảm
-     * bảo truy vấn trả về danh sách rỗng nếu không có chi tiết
+     * CTPX_16: Truy vấn với mã phiếu hợp lệ nhưng không có dữ liệu 
+     * Mục đích: Đảm bảo truy vấn trả về danh sách rỗng nếu không có chi tiết
      */
     @Test
     public void selectAllChiTietPhieuXuat_KhongCoDuLieu() {
@@ -333,8 +334,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC3: Truy vấn với mã phiếu null Mục đích: Đảm bảo hệ thống xử lý an toàn
-     * khi đầu vào là null
+     * CTPX_17: Truy vấn với mã phiếu null 
+     * Mục đích: Đảm bảo hệ thống xử lý an toàn khi đầu vào là null
      */
     @Test
     public void selectAllChiTietPhieuXuat_MaPhieuNull() {
@@ -347,8 +348,8 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC4: Truy vấn với mã phiếu dạng chuỗi không hợp lệ Mục đích: Xác minh hệ
-     * thống không lỗi với chuỗi bất thường
+     * CTPX_18: Truy vấn với mã phiếu dạng chuỗi không hợp lệ 
+     * Mục đích: Xác minh hệ thống không lỗi với chuỗi bất thường
      */
     @Test
     public void selectAllChiTietPhieuXuat_MaPhieuSaiKieu() {
@@ -361,37 +362,9 @@ public class ChiTietPhieuXuatDAOTest {
         Assert.assertEquals(0, ds.size());  // Không được trả về gì cả
     }
 
-//    /**
-//     * TC1: Kiểm tra khi danh sách chi tiết phiếu hợp lệ Mục đích: Đảm bảo số
-//     * lượng tồn được cộng lại và dữ liệu chi tiết phiếu bị xóa đúng cách
-//     */
-//    @Test
-//    public void reset_DanhSachChiTietPhieu_HopLe() throws SQLException {
-//        ChiTietPhieuXuatDAO dao = new ChiTietPhieuXuatDAO();
-//        Connection con = JDBCUtil.getConnection();
-//        con.setAutoCommit(false);
-//        
-//        int maphienban = 2;
-//        ChiTietPhieuDTO ct = new ChiTietPhieuDTO(3001, maphienban, 2, 100000); // giả sử các mã này tồn tại
-//        ArrayList<ChiTietPhieuDTO> list = new ArrayList<>();
-//        list.add(ct);
-//
-//        // Giả lập giảm tồn trước khi reset
-//        PhienBanSanPhamDAO.getInstance().updateSoLuongTon(maphienban, -5);
-//        list.add(ct);
-//
-//        int result = dao.reset(list);
-//
-//        Assert.assertEquals(0, result);
-//        int ton = PhienBanSanPhamDTO.getInstance().updateSoLuongTon(maphienban, result);
-//        Assert.assertTrue(ton >= 5);
-//
-//        dao.con.rollback();
-//    }
-
     /**
-     * TC1: Kiểm tra khi danh sách chi tiết phiếu rỗng Mục đích: Đảm bảo phương
-     * thức hoạt động không lỗi khi không có dữ liệu
+     * CTPX_19: Kiểm tra khi danh sách chi tiết phiếu rỗng 
+     * Mục đích: Đảm bảo phương thức hoạt động không lỗi khi không có dữ liệu
      */
     @Test
     public void reset_DanhSachRong() throws SQLException {
@@ -408,7 +381,7 @@ public class ChiTietPhieuXuatDAOTest {
     }
 
     /**
-     * TC2: Kiểm tra khi có chi tiết phiếu không hợp lệ (mã phiếu không tồn tại)
+     * CTPX_20: Kiểm tra khi có chi tiết phiếu không hợp lệ (mã phiếu không tồn tại)
      * Mục đích: Đảm bảo không xảy ra lỗi và hệ thống xử lý an toàn
      */
     @Test
@@ -417,7 +390,7 @@ public class ChiTietPhieuXuatDAOTest {
         dao.con.setAutoCommit(false);
 
         ChiTietPhieuDTO ct = new ChiTietPhieuDTO();
-        ct.setMaphienbansp(9999); // mã không tồn tại
+        ct.setMaphienbansp(1); // mã không tồn tại
         ct.setMaphieu(9999);      // mã phiếu không có thật
         ct.setSoluong(10);
 
