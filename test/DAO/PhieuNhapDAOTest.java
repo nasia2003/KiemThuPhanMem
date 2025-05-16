@@ -608,4 +608,69 @@ public class PhieuNhapDAOTest {
         assertTrue("AUTO_INCREMENT should be positive", result > 0);
         assertEquals("Should return correct AUTO_INCREMENT value", expected, result);
     }
+    private void insertPhieuNhapTestData(int maphieu, long tongtien) throws SQLException {
+        PhieuNhapDTO phieu = new PhieuNhapDTO();
+        phieu.setMaphieu(maphieu);
+        phieu.setThoigiantao(new Timestamp(System.currentTimeMillis()));
+        phieu.setManhacungcap(1001); // Giả sử mã nhà cung cấp 1001 tồn tại
+        phieu.setManguoitao(1);      // Giả sử người tạo 1 tồn tại
+        phieu.setTongTien(tongtien);
+        phieu.setTrangthai(1);       // Trạng thái mặc định là 1 (hợp lệ)
+        dao.insert(phieu);
+    }
+    private void insertChiTietSanPham(String maimei, int maphienbansp, int maphieunhap, int maphieuxuat, int tinhtrang) throws SQLException {
+        String sql = "INSERT INTO ctsanpham (maimei, maphienbansp, maphieunhap, maphieuxuat, tinhtrang) VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement pst = testCon.prepareStatement(sql)) {
+            pst.setString(1, maimei);
+            pst.setInt(2, maphienbansp);
+            pst.setInt(3, maphieunhap);
+            pst.setInt(4, maphieuxuat);
+            pst.setInt(5, tinhtrang);
+            pst.executeUpdate();
+        }
+    }
+    private void insertPhienBanSanPham(int maphienbansp, int soluongton) throws SQLException {
+        String sql = "INSERT INTO phienbansanpham (maphienbansp, soluongton, masanpham) VALUES (?, ?, ?)";
+        try (PreparedStatement pst = testCon.prepareStatement(sql)) {
+            pst.setInt(1, maphienbansp);
+            pst.setInt(2, soluongton);
+            pst.setInt(3, 1); // Giả sử mã sản phẩm 1 tồn tại
+            pst.executeUpdate();
+        }
+    }
+    private int getSoLuongTon(int maphienbansp) throws SQLException {
+        String sql = "SELECT soluongton FROM phienbansanpham WHERE maphienbansp = ?";
+        try (PreparedStatement pst = testCon.prepareStatement(sql)) {
+            pst.setInt(1, maphienbansp);
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("soluongton");
+                }
+            }
+        }
+        throw new SQLException("Không tìm thấy phiên bản sản phẩm với maphienbansp = " + maphienbansp);
+    }
+    private void insertDummyPhieuNhap(int maphieu) throws SQLException {
+        String sql = "INSERT INTO phieunhap (maphieunhap, thoigian, manhacungcap, nguoitao, tongtien, trangthai) VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement pst = testCon.prepareStatement(sql)) {
+            pst.setInt(1, maphieu);
+            pst.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            pst.setInt(3, 1001); // Giả sử mã nhà cung cấp 1001 tồn tại
+            pst.setInt(4, 1);    // Giả sử người tạo 1 tồn tại
+            pst.setLong(5, 0);   // Tổng tiền mặc định là 0
+            pst.setInt(6, 1);    // Trạng thái mặc định là 1 (hợp lệ)
+            pst.executeUpdate();
+        }
+    }
+    private int getAutoIncrementDirectly() throws SQLException {
+        String sql = "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'quanlikhohang' AND TABLE_NAME = 'phieunhap'";
+        try (PreparedStatement pst = testCon.prepareStatement(sql)) {
+            try (ResultSet rs = pst.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("AUTO_INCREMENT");
+                }
+            }
+        }
+        throw new SQLException("Không thể lấy giá trị AUTO_INCREMENT cho bảng phieunhap");
+    }
 }
