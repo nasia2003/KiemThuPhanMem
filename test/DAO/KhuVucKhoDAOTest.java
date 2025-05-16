@@ -240,20 +240,40 @@ public class KhuVucKhoDAOTest {
     }
 
     @Test
-    public void getAutoIncrement_HopLe() {
-        int nextId = dao.getAutoIncrement();
+    public void getAutoIncrement_HopLe() throws Exception {
+        // Lần 1
+        int id1 = dao.getAutoIncrement();
+        System.out.println("id1: " + id1);
+        assertTrue(id1 > 0);
 
-        // Giá trị phải > 0
-        assertTrue(nextId > 0);
+        insertKhuVucKhoBangSQL(id1, "KV test auto 1", "ghi chú 1");
 
-        // Có thể test insert để xác nhận đúng ID
-        KhuVucKhoDTO dto = new KhuVucKhoDTO(nextId, "KV test auto", "ghi chú");
-        int inserted = dao.insert(dto);
-        assertEquals(1, inserted);
+        KhuVucKhoDTO found1 = dao.selectById(String.valueOf(id1));
+        assertNotNull(found1);
+        assertEquals("KV test auto 1", found1.getTenkhuvuc());
 
-        KhuVucKhoDTO found = dao.selectById(String.valueOf(nextId));
-        assertNotNull(found);
-        assertEquals("KV test auto", found.getTenkhuvuc());
+        // Lần 2
+        int id2 = dao.getAutoIncrement();
+        System.out.println("id2: " + id2    );
+        assertTrue(id2 > id1);
+
+        insertKhuVucKhoBangSQL(id2, "KV test auto 2", "ghi chú 2");
+
+        KhuVucKhoDTO found2 = dao.selectById(String.valueOf(id2));
+        assertNotNull(found2);
+        assertEquals("KV test auto 2", found2.getTenkhuvuc());
+    }
+
+    private void insertKhuVucKhoBangSQL(int id, String ten, String ghichu) throws SQLException {
+        String sql = "INSERT INTO khuvuckho (makhuvuc, tenkhuvuc, ghichu, trangthai) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            stmt.setString(2, ten);
+            stmt.setString(3, ghichu);
+            stmt.setInt(4, 1); // trạng thái mặc định là 1 (hoạt động)
+            int inserted = stmt.executeUpdate();
+            assertEquals("Insert SQL phải thành công", 1, inserted);
+        }
     }
 
 

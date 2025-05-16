@@ -66,9 +66,19 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_ThanhCong() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Insert", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Insert", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(1, result);
+
+        String sql = "SELECT * FROM sanpham WHERE masp = 99";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        assertTrue(rs.next()); // Có ít nhất 1 bản ghi
+        assertEquals("SP Insert", rs.getString("tensp"));
+        assertEquals("img.png", rs.getString("hinhanh"));
+        assertEquals("Chip", rs.getString("chipxuly"));
+        assertEquals(4000, rs.getInt("dungluongpin"));
     }
 
     /**
@@ -79,7 +89,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_TenNull() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, null, "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, null, "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -92,7 +102,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_TenRong() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "", "img.png", 1, "Chip", 4000, 6.0, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "", "img.png", 1, "Chip", 4000, 6.0, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -105,7 +115,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_PinAm() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", "img.png", 1, "Chip", -100, 6.0, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", "img.png", 1, "Chip", -100, 6.0, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -118,7 +128,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_CameraSauNull() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", "img.png", 1, "Chip", 4000, 6.1, 1, 1, null, "8MP", 12, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", "img.png", 1, "Chip", 4000, 6.1, 1, 1, null, "8MP", 12, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -131,7 +141,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_SoLuongTonAm() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, -10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, -10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -144,7 +154,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_HinhAnhNull() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", null, 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", null, 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -157,7 +167,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_HinhAnhEmpty() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", "", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", "", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -170,7 +180,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_ChipXuLyNull() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", "img.png", 1, null, 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", "img.png", 1, null, 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -183,7 +193,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_CameraTruocNull() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", null, 12, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", null, 12, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -196,7 +206,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_ThoiGianBaoHanhAm() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", -6, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", -6, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -209,7 +219,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_ThuongHieuAm() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, -1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, -1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -222,7 +232,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_KhuVucKhoAm() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, -1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, -1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -235,7 +245,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_KichThuocAm() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", "img.png", 1, "Chip", 4000, -5.5, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", "img.png", 1, "Chip", 4000, -5.5, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -248,7 +258,7 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_KichThuocZero() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", "img.png", 1, "Chip", 4000, 0.0, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", "img.png", 1, "Chip", 4000, 0.0, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
     }
@@ -261,9 +271,15 @@ public class SanPhamDAOTest {
      */
     @Test
     public void insertSanPham_KichThuocNaN() throws Exception {
-        SanPhamDTO sp = new SanPhamDTO(0, "SP Test", "img.png", 1, "Chip", 4000, Double.NaN, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
+        SanPhamDTO sp = new SanPhamDTO(99, "SP Test", "img.png", 1, "Chip", 4000, Double.NaN, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
         int result = sanPhamDAO.insert(sp);
         assertEquals(0, result);
+
+        String sql = "SELECT * FROM sanpham WHERE masp = 99";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        assertFalse("Bản ghi không hợp lệ vẫn được insert vào DB", rs.next());
     }
 
     // === UPDATE TESTS ===
@@ -280,6 +296,16 @@ public class SanPhamDAOTest {
         SanPhamDTO sp = new SanPhamDTO(1, "SP Update", "img_upd.png", 1, "ChipX", 5000, 6.5, 2, 2, "16MP", "10MP", 24, 2, 2, 0);
         int result = sanPhamDAO.update(sp);
         assertEquals(1, result);
+
+        String sql = "SELECT * FROM sanpham WHERE masp = 1";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        assertTrue(rs.next()); // Có ít nhất 1 bản ghi
+        assertEquals("SP Update", rs.getString("tensp"));
+        assertEquals("img_upd.png", rs.getString("hinhanh"));
+        assertEquals("ChipX", rs.getString("chipxuly"));
+        assertEquals(5000, rs.getInt("dungluongpin"));
     }
 
     /**
@@ -425,6 +451,13 @@ public class SanPhamDAOTest {
         String masp = "1";
         int result = sanPhamDAO.delete(masp);
         assertEquals(1, result);
+
+        String sql = "SELECT * FROM sanpham WHERE masp = 1";
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        assertTrue(rs.next()); // Có ít nhất 1 bản ghi
+        assertEquals(0, rs.getInt("trangthai"));
     }
 
     /**
@@ -619,25 +652,67 @@ public class SanPhamDAOTest {
 
     /**
      * Mã testcase: SP_42
-     * Mục tiêu: Test getAutoIncrement trả về đúng giá trị
-     * Input:
-     * Expected output: Thực hiện insert sản phẩm với ID trả về thành công và select lại đúng sản phẩm vừa thêm.
+     * Mục tiêu: Test getAutoIncrement trả về đúng giá trị và tăng dần sau mỗi lần insert
+     * Input: Gọi getAutoIncrement hai lần trước mỗi lần insert
+     * Expected output:
+     *  - Gọi getAutoIncrement trả về ID1 > 0
+     *  - Insert sản phẩm với ID1 thành công
+     *  - Gọi lại getAutoIncrement trả về ID2 > ID1
+     *  - Insert sản phẩm với ID2 thành công
      */
     @Test
-    public void getAutoIncrement_HopLe() {
-        int nextId = sanPhamDAO.getAutoIncrement();
+    public void getAutoIncrement_HopLe() throws Exception {
+        // Lần 1
+        int id1 = sanPhamDAO.getAutoIncrement();
+        System.out.println("id1: " + id1);
+        assertTrue("AUTO_INCREMENT lần 1 phải > 0", id1 > 0);
 
-        assertTrue("AUTO_INCREMENT phải lớn hơn 0", nextId > 0);
+        insertSanPhamBangSQL(id1, "SP auto 1");
 
-        SanPhamDTO sp = new SanPhamDTO(nextId, "SP test auto", "img.png", 1, "Chip", 4000, 6.1, 1, 1, "12MP", "8MP", 12, 1, 1, 10);
-        int result = sanPhamDAO.insert(sp);
+        // Kiểm tra đã insert đúng
+        SanPhamDTO sp1 = sanPhamDAO.selectById(String.valueOf(id1));
+        assertNotNull("Phải tìm thấy sản phẩm 1", sp1);
+        assertEquals("Tên sản phẩm 1 phải đúng", "SP auto 1", sp1.getTensp());
 
-        assertEquals("Insert phải thành công trả về 1", 1, result);
+        // Lần 2
+        int id2 = sanPhamDAO.getAutoIncrement();
+        System.out.println("id2: " + id2);
+        assertTrue("AUTO_INCREMENT lần 2 phải > id1", id2 > id1);
 
-        // Lấy lại theo id mới insert
-        SanPhamDTO found = sanPhamDAO.selectById(String.valueOf(nextId));
-        assertNotNull("Phải tìm thấy sản phẩm vừa insert", found);
-        assertEquals("Tên sản phẩm phải đúng", "SP test auto", found.getTensp());
+        insertSanPhamBangSQL(id2, "SP auto 2");
+
+        // Kiểm tra đã insert đúng
+        SanPhamDTO sp2 = sanPhamDAO.selectById(String.valueOf(id2));
+        assertNotNull("Phải tìm thấy sản phẩm 2", sp2);
+        assertEquals("Tên sản phẩm 2 phải đúng", "SP auto 2", sp2.getTensp());
+    }
+
+    private void insertSanPhamBangSQL(int id, String tensp) throws SQLException {
+        String sql = "INSERT INTO sanpham (masp, tensp, hinhanh, xuatxu, chipxuly, dungluongpin, kichthuocman, hedieuhanh, phienbanhdh, camerasau, cameratruoc, thoigianbaohanh, thuonghieu, khuvuckho, soluongton, trangthai) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        PreparedStatement stmt = connection.prepareStatement(sql);
+        stmt.setInt(1, id);
+        stmt.setString(2, tensp);
+        stmt.setString(3, "img.png");
+        stmt.setInt(4, 1);
+        stmt.setString(5, "Chip");
+        stmt.setInt(6, 4000);
+        stmt.setDouble(7, 6.1);
+        stmt.setInt(8, 1);
+        stmt.setInt(9, 1);
+        stmt.setString(10, "12MP");
+        stmt.setString(11, "8MP");
+        stmt.setInt(12, 12);
+        stmt.setInt(13, 1);
+        stmt.setInt(14, 1);
+        stmt.setInt(15, 10);
+        stmt.setInt(16, 1); // trangthai
+
+        int inserted = stmt.executeUpdate();
+        assertEquals("Insert SQL phải thành công", 1, inserted);
+
+        stmt.close();
     }
 
     // === UPDATE SO LUONG TON TESTS ===
