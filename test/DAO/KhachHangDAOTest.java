@@ -21,9 +21,9 @@ public class KhachHangDAOTest {
         // Kiểm tra nếu đối tượng trả về là một thể hiện của KhachHangDAO
         Assert.assertTrue("Object should be an instance of KhachHangDAO", dao instanceof KhachHangDAO);
     }
-    
+
     /**
-     * TC01
+     * KH01
      * Mục tiêu: Kiểm tra chèn khách hàng hợp lệ vào DB → kết quả mong đợi: 1
      */
     @Test
@@ -40,9 +40,9 @@ public class KhachHangDAOTest {
         Assert.assertEquals(1, result);
         dao.con.rollback();
     }
-    
+
     /**
-     * TC02
+     * KH02
      * Mục tiêu: Kiểm tra chèn khách hàng với mã đã tồn tại → kết quả mong đợi: 0 (thất bại)
      */
     @Test
@@ -59,9 +59,9 @@ public class KhachHangDAOTest {
         Assert.assertEquals(0, result);
         dao.con.rollback();
     }
-    
+
     /**
-     * TC03
+     * KH03
      * Mục tiêu: Kiểm tra khi tên khách hàng bị thiếu (null) → kết quả mong đợi: 0
      */
     @Test
@@ -80,7 +80,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC04
+     * KH04
      * Mục tiêu: Kiểm tra khi số điện thoại null → kết quả mong đợi: 0
      */
     @Test
@@ -98,7 +98,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC05
+     * KH05
      * Mục tiêu: Kiểm tra khi mã khách hàng là số âm → kết quả mong đợi: 0
      */
     @Test
@@ -115,13 +115,13 @@ public class KhachHangDAOTest {
         Assert.assertEquals(0, result);
         dao.con.rollback();
     }
-    
+
     /**
-     * TC06
+     * KH06
      * Mục tiêu: Kiểm tra khi số điện thoại chứa toàn chữ cái → kết quả mong đợi: 0 (thất bại nếu DB có validate)
      */
     @Test
-    public void insertKhachHang_SdtToanChu() throws SQLException { 
+    public void insertKhachHang_SdtToanChu() throws SQLException {
         KhachHangDTO kh = new KhachHangDTO();
         KhachHangDAO dao = new KhachHangDAO();
         kh.setHoten("Khách hàng Sai SĐT");
@@ -135,11 +135,11 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC07
+     * KH07
      * Mục tiêu: Kiểm tra khi số điện thoại chỉ có 3 ký tự → kết quả mong đợi: 0 (thất bại nếu có kiểm tra độ dài)
      */
     @Test
-    public void insertKhachHang_SdtQuaNgan() throws SQLException { 
+    public void insertKhachHang_SdtQuaNgan() throws SQLException {
         KhachHangDTO kh = new KhachHangDTO();
         KhachHangDAO dao = new KhachHangDAO();
         kh.setHoten("Khách hàng SĐT Ngắn");
@@ -153,7 +153,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC08
+     * KH08
      * Mục tiêu: Kiểm tra khi tên khách hàng chỉ gồm toàn khoảng trắng → mong đợi: thất bại (0)
      */
     @Test
@@ -171,7 +171,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC09
+     * KH09
      * Mục tiêu: Kiểm tra khi địa chỉ chỉ gồm toàn khoảng trắng → mong đợi: thất bại (0)
      */
     @Test
@@ -187,9 +187,9 @@ public class KhachHangDAOTest {
         Assert.assertEquals(0, result); // Mong đợi: thất bại do dữ liệu không hợp lệ
         dao.con.rollback();
     }
-    
+
     /**
-     * TC01
+     * KH10
      * Mục tiêu: Kiểm tra trường hợp cập nhật hợp lệ
      */
     @Test
@@ -206,9 +206,9 @@ public class KhachHangDAOTest {
         Assert.assertEquals(1, result); // Mong đợi: 1 nếu cập nhật thành công
         dao.con.rollback();
     }
-    
+
     /**
-     * TC02
+     * KH11
      * Mục tiêu: Kiểm tra khi tên khách hàng đã tồn tại trong DB (giả sử DB không cho phép trùng tên)
      */
     @Test
@@ -227,7 +227,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC04
+     * KH12
      * Mục tiêu: Kiểm tra khi số điện thoại sai định dạng
      */
     @Test
@@ -246,9 +246,9 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC05
+     * KH13
      * Mục tiêu: Kiểm tra khi mã khách hàng không tồn tại trong DB
-    */
+     */
     @Test
     public void updateKhachHang_KhongTonTai() throws SQLException {
         KhachHangDTO kh = new KhachHangDTO();
@@ -265,9 +265,9 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC06
+     * KH14
      * Mục tiêu: Kiểm tra khi tên khách hàng chỉ toàn khoảng trắng
-    */
+     */
     @Test
     public void updateKhachHang_TenToanKhoangTrang() throws SQLException {
         KhachHangDTO kh = new KhachHangDTO();
@@ -284,9 +284,9 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC07
+     * KH15
      * Mục tiêu: Kiểm tra trường hợp tất cả các thông tin hợp lệ
-    */
+     */
     @Test
     public void updateKhachHang_ThanhCong() throws SQLException {
         KhachHangDTO kh = new KhachHangDTO();
@@ -303,9 +303,9 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC08
+     * KH16
      * Mục tiêu: Kiểm tra khi mã khách hàng là số âm
-    */
+     */
     @Test
     public void updateKhachHang_MaKHAm() throws SQLException {
         KhachHangDTO kh = new KhachHangDTO();
@@ -320,11 +320,11 @@ public class KhachHangDAOTest {
         Assert.assertEquals(0, result); // Mong đợi: 0 nếu mã khách hàng không hợp lệ
         dao.con.rollback();
     }
-    
+
     /**
-     * TC01
+     * KH17
      * Mục tiêu: Xóa khách hàng với mã hợp lệ (tồn tại trong DB)
-    */
+     */
     @Test
     public void deleteKhachHang_HopLe() throws SQLException {
         KhachHangDAO dao = new KhachHangDAO();
@@ -336,9 +336,9 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC02
+     * KH18
      * Mục tiêu: Xóa khách hàng với mã không tồn tại
-    */
+     */
     @Test
     public void deleteKhachHang_KhongTonTai() throws SQLException {
         KhachHangDAO dao = new KhachHangDAO();
@@ -350,9 +350,9 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC03
+     * KH19
      * Mục tiêu: Xóa khách hàng với mã rỗng
-    */
+     */
     @Test
     public void deleteKhachHang_MaRong() throws SQLException {
         KhachHangDAO dao = new KhachHangDAO();
@@ -362,11 +362,11 @@ public class KhachHangDAOTest {
         Assert.assertEquals(0, result); // Mong đợi: 0 hoặc exception tuỳ kiểm tra
         dao.con.rollback();
     }
-    
+
     /**
-     * TC04
+     * KH20
      * Mục tiêu: Xóa khách hàng với mã là null
-    */
+     */
     @Test
     public void deleteKhachHang_MaNull() throws SQLException {
         KhachHangDAO dao = new KhachHangDAO();
@@ -376,11 +376,11 @@ public class KhachHangDAOTest {
         Assert.assertEquals(0, result); // Mong đợi: 0 hoặc exception nếu không xử lý null
         dao.con.rollback();
     }
-    
+
     /**
-     * TC05
+     * KH21
      * Mục tiêu: Xóa khách hàng với mã là ký tự đặc biệt
-    */
+     */
     @Test
     public void deleteKhachHang_MaKyTuDacBiet() throws SQLException {
         KhachHangDAO dao = new KhachHangDAO();
@@ -392,9 +392,9 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC06
+     * KH22
      * Mục tiêu: Xóa khách hàng đã bị xóa trước đó (trạng thái = 0)
-    */
+     */
     @Test
     public void deleteKhachHang_DaXoaTruoc() throws SQLException {
         KhachHangDAO dao = new KhachHangDAO();
@@ -406,9 +406,9 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC07
+     * KH23
      * Mục tiêu: Xóa khách hàng với mã chứa khoảng trắng
-    */
+     */
     @Test
     public void deleteKhachHang_MaKhoangTrang() throws SQLException {
         KhachHangDAO dao = new KhachHangDAO();
@@ -420,9 +420,9 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC08
+     * KH24
      * Mục tiêu: Xóa khách hàng với mã là số âm (nếu dữ liệu là số)
-    */
+     */
     @Test
     public void deleteKhachHang_MaAm() throws SQLException {
         KhachHangDAO dao = new KhachHangDAO();
@@ -434,7 +434,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC01: Lấy danh sách khách hàng khi có dữ liệu
+     * KH25: Lấy danh sách khách hàng khi có dữ liệu
      * Mục đích: Kiểm tra phương thức có trả về danh sách chứa các khách hàng hợp lệ không
      */
     @Test
@@ -446,7 +446,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC02: Lấy danh sách khách hàng khi không có dữ liệu (tất cả đã bị xóa mềm)
+     * KH26: Lấy danh sách khách hàng khi không có dữ liệu (tất cả đã bị xóa mềm)
      * Mục đích: Kiểm tra nếu không có khách hàng nào có trạng thái = 1 thì danh sách trả về rỗng
      */
     @Test
@@ -463,7 +463,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC03: Kiểm tra dữ liệu trả về có đầy đủ thông tin từng khách hàng
+     * KH27: Kiểm tra dữ liệu trả về có đầy đủ thông tin từng khách hàng
      * Mục đích: Đảm bảo từng đối tượng trả về đều có thông tin đầy đủ, không bị null
      */
     @Test
@@ -480,7 +480,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC04: Không có lỗi xảy ra khi gọi selectAll
+     * KH28: Không có lỗi xảy ra khi gọi selectAll
      * Mục đích: Kiểm tra rằng hàm hoạt động ổn định, không ném exception
      */
     @Test
@@ -495,7 +495,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC01: Truy xuất với mã khách hàng hợp lệ
+     * KH29: Truy xuất với mã khách hàng hợp lệ
      * Mục đích: Kiểm tra hàm trả về đúng đối tượng khi mã KH tồn tại
      */
     @Test
@@ -509,7 +509,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC2: Truy xuất với mã không tồn tại
+     * KH30: Truy xuất với mã không tồn tại
      * Mục đích: Kiểm tra hàm trả về null khi mã không tồn tại
      */
     @Test
@@ -522,7 +522,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC3: Truy xuất với mã là null
+     * KH31: Truy xuất với mã là null
      * Mục đích: Đảm bảo không bị crash và trả về null nếu mã là null
      */
     @Test
@@ -535,7 +535,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC4: Truy xuất với chuỗi rỗng ""
+     * KH32: Truy xuất với chuỗi rỗng ""
      * Mục đích: Đảm bảo hệ thống xử lý an toàn nếu mã rỗng
      */
     @Test
@@ -548,7 +548,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC5: Truy xuất với mã có ký tự không hợp lệ (ký tự chữ)
+     * KH33: Truy xuất với mã có ký tự không hợp lệ (ký tự chữ)
      * Mục đích: Kiểm tra khi truyền chuỗi không phải số vào
      */
     @Test
@@ -561,7 +561,7 @@ public class KhachHangDAOTest {
     }
 
     /**
-     * TC1: Lấy giá trị AUTO_INCREMENT hợp lệ
+     * KH34: Lấy giá trị AUTO_INCREMENT hợp lệ
      * Mục đích: Kiểm tra hàm trả về giá trị > 0 nếu bảng tồn tại và có AUTO_INCREMENT
      */
     @Test
